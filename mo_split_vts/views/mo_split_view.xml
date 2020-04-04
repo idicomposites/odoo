@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <record id="split_manufacture_order_form_view" model="ir.ui.view">
+      <field name="name">split.manufacturing.order.form.view</field>
+      <field name="model">split.mo</field>
+      <field name="arch" type="xml">
+        <form string="Split Manufacture Order">
+        	<p>Enter the Number Of Qty. Based on that Generate the New MO of that Qty and decrease the product qty from Main MO.</p>
+          <group>
+             <field name="split_mo_lot"/>
+	  </group>
+          <footer>
+            <button name="split_mo" string="Split Manufacture Order" type="object" class="oe_highlight"/>or
+            <button string="Cancel" class="oe_link" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+	
+   <record id="action_split_manufacture_order" model="ir.actions.act_window">
+        <field name="name">Split MO</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">split.mo</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="mrp.model_mrp_production" />
+    </record>
+    
+  </data>
+</odoo>
