@@ -10,8 +10,8 @@
 					<field name="main_mo_id" string="Parent MO"/>
 				</xpath>
 				<xpath expr="//button[@name='action_assign']" position="after">
-					<button name="%(mo_split_vts.action_split_manufacture_order)d" 
-					attrs="{'invisible':[('state','not in',('confirmed'))]}" string="Split MO" type="action" class="oe_highlight"/>
+					<button name="open_slip_wizard" 
+					attrs="{'invisible':[('state','not in',('confirmed'))]}" string="Split MO" type="object" class="oe_highlight" />
 				</xpath>
 			</field>
 		</record>

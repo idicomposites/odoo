@@ -9,9 +9,7 @@ class res_config(models.TransientModel):
     def get_values(self):
         res = super(res_config, self).get_values()
         params = self.env['ir.config_parameter'].sudo()
-        res.update(                    
-                    mo_split_based_on = params.get_param('mo_split_vts.mo_split_based_on',default='based_on_number_of_split')
-                   )
+        res.update(mo_split_based_on = params.get_param('mo_split_vts.mo_split_based_on',default='based_on_number_of_split'))
         return res
     
     def set_values(self):

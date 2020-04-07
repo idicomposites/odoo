@@ -6,7 +6,7 @@ class SplitManufactureOrder(models.TransientModel):
     _name = 'split.mo'
     _description = 'Split Manufacturing Order'
     
-    split_mo_lot = fields.Integer(string='Number Of Qty/Split', required=True,help="Split MO Based on Configuration Like Number Of Qty/Lot.based on that split the MO of that Qty and decrease the product qty from Main MO.")
+    split_mo_lot = fields.Integer(string='Numero de Cant/Split', required=True,help="Split MO Based on Configuration Like Number Of Qty/Lot.based on that split the MO of that Qty and decrease the product qty from Main MO.")
     
     def split_mo(self):
         mo_obj = self.env['mrp.production']

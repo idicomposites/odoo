@@ -1,14 +1,14 @@
 {
-    'name': 'Split Manufacturing Order ',
-    'version': '13.0.16.10.2019',
+    'name': 'Dividir ordenes de Produccion',
+    'version': '1.0.1',
     'category': 'Manufacturing',
-    'author': "Vraja Technologies",
+    'author': "Ahorasoft",
     'price': 27
 ,
-    'currency': 'EUR',
-    'summary':"This Module Allow us to Split Manufacturing Order Based on Number of Split.Split Mo in Equal Part",
+    'currency': 'BOB',
+    'summary':"This Module Allow us to Dividir ordenes de ProduccionBased on Number of Split.Split Mo in Equal Part",
     'depends': [
-        'mrp',
+        'mrp','as_idi_mrp'
     ],
     'data': [
         'views/mo_split_view.xml',
