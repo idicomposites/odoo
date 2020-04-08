@@ -1,6 +1,7 @@
 ==============================================
 Split Manufactuing Order
 ==============================================
+1.0.2
 This module provide Feature to allow user to split Manufacture order.
 
 ========
