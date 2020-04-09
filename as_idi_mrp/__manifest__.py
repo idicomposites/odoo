@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name' : "Ahorasoft MRP customizaciones",
-    'version' : "1.0.0",
+    'version' : "1.0.1",
     'author'  : "Ahorasoft",
     'description': """
 Customizaciones para VAXMEX
@@ -20,6 +20,7 @@ Custom module for Latproject
         'wizard/mrp_product_produce.xml',
         'views/as_sale_order.xml',
         'views/as_stock_picking.xml',
+        'views/as_contenedor.xml'
              ],
     'demo' : [],
     'installable': True,
