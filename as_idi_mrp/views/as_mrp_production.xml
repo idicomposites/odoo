@@ -13,6 +13,7 @@
             </xpath>
             <xpath expr="//field[@name='bom_id']" position="after">
                 <field name="as_lot" />
+                <field name="as_sale" />
             </xpath>
         </field>
     </record>
@@ -23,6 +24,7 @@
         <field name="inherit_id" ref="mrp.mrp_production_tree_view" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
+                <field name="as_sale" />
                 <field name="as_lot" />
             </xpath>
         </field>
@@ -36,6 +38,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_uom']" position="after">
                     <field name="as_lotes" />
+                    
                 </xpath>
             </field>
         </record>

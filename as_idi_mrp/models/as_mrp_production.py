@@ -17,8 +17,38 @@ class as_mrp_workorder(models.Model):
     as_lote_numero = fields.Integer(string='Cantidad Lote')
     as_lote_peso = fields.Float(string='Peso x Lote')
     as_tanque = fields.Integer(string='Tanque')
-    as_lot = fields.Char(string='Nro. Lote')
-    
+    as_sale = fields.Many2one('sale.order', 'Venta Origen', readonly=True)
+    as_lot = fields.Many2one('stock.production.lot', 'Nro Lote',
+    domain="[('product_id', '=', product_id), ('company_id', '=', company_id)]",readonly=True)
+
+    def open_produce_product(self):
+        self.ensure_one()
+        if self.bom_id.type == 'phantom':
+            raise UserError(_('You cannot produce a MO with a bom kit product.'))
+        action = self.env.ref('mrp.act_mrp_product_produce').read()[0]
+        action.update({
+            'context': {
+                'default_finished_lot_id': self.as_lot.id,
+               
+            },
+        })
+        return action  
+
+    @api.model
+    def create(self, vals):
+        if 'origin' in vals:
+            sale = self.env['sale.order'].search([('name', '=', vals['origin'])])
+            if sale:
+                vals['as_sale']= sale.id
+        picking_type = super(as_mrp_workorder, self).create(vals)
+        return picking_type
+
+    @api.depends('origen')
+    def onchange_as_origen(self):
+        sale = self.env['sale.order'].search([('name', '=', self.origin)])
+        if sale:
+            self.write({'as_sale':sale.id})
+
     @api.onchange('as_lote_numero','as_tanque')
     def onchange_as_tanque(self):
         for order in self:
