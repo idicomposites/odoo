@@ -92,6 +92,7 @@ class as_webservice(http.Controller):
                             'tipo_producto': product.type,
                             'categoria_producto': self.obj_to_json(product.categ_id),
                             'tipo_producto_idi': product.as_tipo_producto_idi,
+                            'color': product.as_color,
                             'referencia_interna': product.default_code,
                             'codigo_barras': product.barcode,
                             'precio_venta':	product.list_price,
