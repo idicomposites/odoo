@@ -28,4 +28,6 @@ class as_product_template(models.Model):
             ]
 
     as_tipo_producto_idi = fields.Selection(valores, string='Tipo De Producto IDI')
+    as_color = fields.Char(string='Color')
+    
 

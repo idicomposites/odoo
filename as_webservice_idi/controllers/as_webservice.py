@@ -66,6 +66,8 @@ class as_webservice(http.Controller):
         current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
         if not current_user:
             res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)  
         if current_user:
             filtro = '[]'
             # product_model = request.env['product.product']
