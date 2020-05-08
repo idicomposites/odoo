@@ -58,8 +58,51 @@ class as_webservice(http.Controller):
                     json_partners.append(rp)
                 res = json.dumps(json_partners)
                 callback = post.get('callback')
-                return '{0}({1})'.format(callback, res)    
-    
+                return '{0}({1})'.format(callback, res)
+
+    @http.route(['/tiamericas/productos','/tiamericas/productos/<product_id>'], auth="public", type="http")
+    def product(self, product_id = None, **post):
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+        if current_user:
+            filtro = '[]'
+            # product_model = request.env['product.product']
+            if product_id:
+                filtro = [('id','=',product_id)]
+                product_ids = request.env['product.template'].sudo().search(filtro)
+            else:
+                product_ids = request.env['product.template'].sudo().search([])   
+          
+            if not product_ids:
+                res_json = json.dumps({'error': _('Producto no encontrado')})
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res_json)
+            else:
+                rp = {}
+                json_dict = []
+
+                for product in product_ids:  
+                    rp = {
+                            'id': product.id,
+                            'nombre': product.name,
+                            'tipo_producto': product.type,
+                            'categoria_producto': self.obj_to_json(product.categ_id),
+                            'tipo_producto_idi': product.as_tipo_producto_idi,
+                            'referencia_interna': product.default_code,
+                            'codigo_barras': product.barcode,
+                            'precio_venta':	product.list_price,
+                            'costo': product.standard_price,
+                            'impuestos_cliente': self.obj_to_json(product.taxes_id),
+                            'unidad_medida': self.obj_to_json(product.uom_id),
+                            'unidad_medida_compra':	self.obj_to_json(product.uom_po_id),
+                        }
+                    json_dict.append(rp)
+                res = json.dumps(json_dict)
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res)
+
     @http.route('/tiamericas/get_token', type='json',  auth='user')
     def get_token(self, **post):        
         user = request.env['res.users'].sudo().browse(post['local_context']['uid'])
@@ -92,3 +135,16 @@ class as_webservice(http.Controller):
             res_json = json.dumps(res)
             callback = post.get('callback')
             return '{0}({1})'.format(callback, res_json)
+
+    # Convertir objeto a json
+    def obj_to_json(self, objeto):
+        json_dict = []
+        if objeto:
+            for child in objeto:
+                json_dict.append({
+                    "id": child.id,
+                    "name": child.name, #Nombre cliente
+                })
+        else:
+            json_dict = {'error': _('Not found')}
+        return json_dict

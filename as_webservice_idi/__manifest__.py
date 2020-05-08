@@ -14,20 +14,23 @@
     'Maintainer':"Carlos Paz",
     'website': 'http://www.tiamericas.com/',
 
-    'category': 'Integration',
+    'category': 'Product',
     'version': '13.0.1',
 
     # any module necessary for this one to work correctly
     'depends': [
         'mail',
         'base',
+        'stock',
+        "sale_management",
+
     ],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         # 'wizard/sale_whatsapp_wizard.xml',
-        # 'views/as_config_settings.xml',
+        'views/as_product_template.xml',
         'views/as_users.xml',
     ],
     # 'qweb': [
