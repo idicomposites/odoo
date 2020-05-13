@@ -3,6 +3,14 @@
         <report id="report_certificate_idi" model="quality.check" string="Certificado de Calidad" report_type="xlsx"
                 name="as_idi_mrp.report_certificate_idi.xlsx" file="as_idi_mrp.report_certificate_idi.xlsx"
                 print_report_name="'Certificado - %s' % (object.name)" attachment_use="False" menu="True" />
+ <report id="as_materia_prima_qweb_pdf"
+            model="stock.picking"
+            string="Etiqueta materia prima (PDF)"
+            name="as_idi_mrp.label_materia_prima_view_pdf"
+            file="as_idi_mrp.label_materia_prima_view_pdf"
+            report_type="qweb-pdf"
+             menu="True" 
+        />
         <record id="as_materia_prima_package" model="report.paperformat">
                 <field name="name">Impresion Eqtiquetas Materia Prima</field>
                 <field name="default" eval="True" />
@@ -18,33 +26,7 @@
                 <field name="header_line" eval="False" />
                 <field name="report_ids" eval="[(4, ref('as_idi_mrp.as_materia_prima_qweb_pdf'))]" />
         </record>
-        <!-- 
-    <record id="as_materia_prima_qweb_pdf" model="ir.actions.report">
-      <field name="name">Etiqueta materia prima</field>
-      <field name="paperformat_id" ref="as_idi_mrp.as_materia_prima_package" />
-      <field name="model">stock.picking</field>
-      <field name="report_type">qweb-pdf</field>
-      <field name="print_report_name">'Etiquetas de - %s' % (object.name)</field>
-      <field name="report_name">as_idi_mrp.label_materia_prima_view_pdf</field>
-      <field name="menu">1</field>
-      </record> -->
-        <!-- <report 
-        id="as_materia_prima_qweb_pdf" 
-        model="stock.picking" 
-        string="Etiqueta materia prima"
-        report_type="qweb-pdf" 
-        name="as_idi_mrp.label_materia_prima_view_pdf" 
-        file="as_idi_mrp.label_materia_prima_view_pdf"
-        print_report_name="'Etiquetas de - %s' % (object.name)" 
-        attachment_use="False" 
-        menu="True" /> -->
-         <report id="as_materia_prima_qweb_pdf"
-            model="stock.picking"
-            string="Etiqueta materia prima (PDF)"
-            name="as_idi_mrp.label_materia_prima_view_pdf"
-            file="as_idi_mrp.label_materia_prima_view_pdf"
-            report_type="qweb-pdf"
-             menu="True" 
-        />
+
+        
 
 </odoo>
