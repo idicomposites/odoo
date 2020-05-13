@@ -50,5 +50,6 @@
         id='as_marp_machine'
         parent='mrp.menu_mrp_bom' 
         sequence='10' />
+
     </data>
 </odoo>

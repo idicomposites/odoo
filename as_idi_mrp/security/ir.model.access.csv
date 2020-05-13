@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 as_machine,as_machine.con.marca,model_as_machine,mrp.group_mrp_user,1,1,1,1
 as_contenedor,as_contenedor.con.marca,model_as_contenedor,stock.group_stock_user,1,1,1,1
+product_certificate_format,product_certificate_format.con.marca,model_product_certificate_format,stock.group_stock_user,1,1,1,1

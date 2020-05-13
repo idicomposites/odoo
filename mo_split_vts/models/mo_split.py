@@ -61,7 +61,7 @@ class SplitManufactureOrder(models.TransientModel):
         if not machine:
             machine = 'ND'
         tipo_material = production_id.as_lot.name
-        new_name = name+'-'+machine+'-'+tipo_material
+        new_name = name+''+machine+''+tipo_material
         production_id.as_lot.write({
             'name': new_name
         })

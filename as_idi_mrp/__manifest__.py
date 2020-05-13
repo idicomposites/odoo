@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 {
     'name' : "Ahorasoft MRP customizaciones",
-    'version' : "1.0.2",
+    'version' : "1.0.3",
     'author'  : "Ahorasoft",
     'description': """
-Customizaciones para VAXMEX
+Customizaciones para IDI
 ===========================
 
 Custom module for Latproject
     """,
     'category' : "MRP",
-    'depends' : ["mrp","product",'sale','purchase','stock'],
+    'depends' : ["mrp","product",'sale','purchase','stock','report_xlsx',],
     'website': 'http://www.ahorasoft.com',
     'data' : [
         'security/ir.model.access.csv',
@@ -20,7 +20,12 @@ Custom module for Latproject
         'wizard/mrp_product_produce.xml',
         'views/as_sale_order.xml',
         'views/as_stock_picking.xml',
-        'views/as_contenedor.xml'
+        'views/as_contenedor.xml',
+        'views/as_product_template.xml',
+        'views/as_res_partner.xml',
+        'views/as_report_format.xml',
+        'views/as_quality_views.xml',
+        'report/as_report_materia_prima.xml',
              ],
     'demo' : [],
     'installable': True,
