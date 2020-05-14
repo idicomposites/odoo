@@ -61,5 +61,11 @@
                 (0, 0, {'view_mode': 'tree', 'view_id': ref('as_certificate_tree')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('as_certificate_form')})]" />
         </record>
+
+         <menuitem
+            id="menu_format_config"
+            action="as_certificate_action"
+            name="Formatos de Certificados" parent="stock.menu_stock_inventory_control" sequence="12"/>
+
 </odoo>
 

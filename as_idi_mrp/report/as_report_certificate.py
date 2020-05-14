@@ -99,7 +99,14 @@ class as_kardex_productos_excel(models.AbstractModel):
         filas = 7
         filas += 1
         code_format = lines.product_id.as_format_type_id.as_code
-        point = self.env['quality.point'].search([('product_tmpl_id', '=', lines.product_id.product_tmpl_id.id)])
+        point_array =[]
+        point_all = self.env['quality.point'].search([('product_tmpl_id', '=', lines.product_id.product_tmpl_id.id)])
+        quality_check_all = self.env['quality.check'].search([('lot_id', '=', lines.lot_id.id)])
+        for quelity in quality_check_all:
+            for point in point_all:
+                if quelity.point_id.id == point.id:
+                    point_array.append(point.id)
+        point = self.env['quality.point'].search([('id', 'in', point_array)])
         quality_check = self.env['quality.check'].search([('product_id', '=', lines.product_id.id)])
         if code_format == 4:
             filas += 1
@@ -109,7 +116,7 @@ class as_kardex_productos_excel(models.AbstractModel):
             sheet.merge_range('L7:M7', 'Reference Method', letter12)
             filas += 1
             cont=7
-            for item in point:
+            for item in point_all:
                 cont +=1
                 sheet.merge_range('B'+str(cont)+':E'+str(cont), item.title, letter11)
                 sheet.merge_range('F'+str(cont)+':H'+str(cont), item.norm_unit, letter11)
@@ -154,7 +161,7 @@ class as_kardex_productos_excel(models.AbstractModel):
 
             cont =3
             for intem in point:
-                sheet.merge_range(filas,cont,filas,cont+2,intem.title+'('+intem.norm_unit+')',letter11)
+                sheet.merge_range(filas,cont,filas,cont+2,str(intem.title)+'('+str(intem.norm_unit)+')',letter11)
                 sheet.merge_range(filas+1,cont,filas+1,cont+1,'Specification',letter11)
                 sheet.merge_range(filas+1,cont+2,filas+2,cont+2,'Result',letter11)
                 sheet.write(filas+2, cont, 'Max',letter11) #cliente/proveedor
