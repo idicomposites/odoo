@@ -202,9 +202,7 @@ class as_webservice(http.Controller):
                             'product_qty': mrp.product_qty,
                             # 'bom_name': mrp.bom_id.product_tmpl_id.name,
                             # 'bom_id': mrp.bom_id.product_tmpl_id.id,
-                            
                             'bom_id': self.obj_to_json(mrp.bom_id,('product_tmpl_id','id','product_qty','code')),
-
                             'as_lot': self.obj_to_json(mrp.as_lot),
                             'version': mrp.bom_id.version,
                             'code': mrp.bom_id.code,
@@ -216,6 +214,49 @@ class as_webservice(http.Controller):
                             'as_lote_peso': mrp.as_lote_peso,
                             'as_tanque': mrp.as_tanque,
                             'move_raw_ids': self.obj_to_json(mrp.move_raw_ids,fields_mrp_line),
+                        }
+                    json_dict.append(rp)
+                res = json.dumps(json_dict)
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res)
+
+    # STOCK READ
+    @http.route(['/tiamericas/stock','/tiamericas/stock/<stock_id>'], auth="public", type="http")
+    def stock(self, stock_id = None, **post):
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)  
+        if current_user:
+            filtro = '[]'
+            # product_model = request.env['product.product']
+            if stock_id:
+                filtro = [('id','=',stock_id)]
+                stock_ids = request.env['stock.picking'].sudo().search(filtro)
+            else:
+                stock_ids = request.env['stock.picking'].sudo().search([])
+          
+            if not stock_ids:
+                res_json = json.dumps({'error': _('MO no encontrado')})
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res_json)
+            else:
+                rp = {}
+                json_dict = []
+                fields_stock_line = ('id','name','as_peso','as_lote')
+                # fields_stock_line = ('product_id','id')
+
+                for stock in stock_ids:
+                    # Ensamblando registro
+                    rp = {
+                            'id': stock.id,
+                            'name': stock.name,
+                            'origin': stock.origin,
+                            'picking_type_id': self.obj_to_json(stock.picking_type_id),
+                            'date_done': str(stock.date_done),
+                            'as_contenedor_id': self.obj_to_json(stock.as_contenedor_id,fields_stock_line),
                         }
                     json_dict.append(rp)
                 res = json.dumps(json_dict)
