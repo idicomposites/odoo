@@ -23,6 +23,7 @@
         'base',
         'stock',
         "sale_management",
+        "mrp",
 
     ],
 

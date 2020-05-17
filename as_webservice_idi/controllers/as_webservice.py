@@ -15,8 +15,9 @@ from werkzeug import urls
 from werkzeug.wsgi import wrap_file
 
 class as_webservice(http.Controller):
-    @http.route(["/tiamericas/clientes/","/tiamericas/clientes/<partner_id>"], auth='public', type="http")
 
+    # Clientes READ
+    @http.route(["/tiamericas/clientes/","/tiamericas/clientes/<partner_id>"], auth='public', type="http")
     def partner(self, partner_id = None, **post):
         el_token = post.get('token') or 'sin_token'
         current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
@@ -60,6 +61,7 @@ class as_webservice(http.Controller):
                 callback = post.get('callback')
                 return '{0}({1})'.format(callback, res)
 
+    # PRODUCTOS READ
     @http.route(['/tiamericas/productos','/tiamericas/productos/<product_id>'], auth="public", type="http")
     def product(self, product_id = None, **post):
         el_token = post.get('token') or 'sin_token'
@@ -106,12 +108,128 @@ class as_webservice(http.Controller):
                 callback = post.get('callback')
                 return '{0}({1})'.format(callback, res)
 
+    # BOM READ
+    @http.route(['/tiamericas/bom','/tiamericas/bom/<bom_id>'], auth="public", type="http")
+    def bom(self, bom_id = None, **post):
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)  
+        if current_user:
+            filtro = '[]'
+            # product_model = request.env['product.product']
+            if bom_id:
+                filtro = [('id','=',bom_id)]
+                bom_ids = request.env['mrp.bom'].sudo().search(filtro)
+            else:
+                bom_ids = request.env['mrp.bom'].sudo().search([])   
+          
+            if not bom_ids:
+                res_json = json.dumps({'error': _('BOM no encontrado')})
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res_json)
+            else:
+                rp = {}
+                json_dict = []
+
+                for bom in bom_ids:
+                    # ensamblar lines
+                    bom_line = request.env['mrp.bom.line']
+                    bom_lines = bom_line.sudo().search([('bom_id','=',bom.id)])
+                    bom_line_json_dict = []
+                    if bom_lines:
+                        for bom_line in bom_lines:
+                            bom_line_json_dict.append({
+                                "id":bom_line.id,
+                                "product_id":self.obj_to_json(bom_line.product_id),
+                                "product_qty":bom_line.product_qty,
+                                "sequence":bom_line.sequence,
+                            })
+                    else:
+                        bom_line_json_dict = {'error': _('Sin lineas')}
+
+                    # Ensamblando registro
+                    rp = {
+                            'id': bom.id,
+                            'product_tmpl_id': self.obj_to_json(bom.product_tmpl_id),
+                            'product_qty': bom.product_qty,
+                            'code': bom.code,
+                            'type': bom.type,
+                            'bom_lines': bom_line_json_dict,
+                        }
+                    json_dict.append(rp)
+                res = json.dumps(json_dict)
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res)
+
+    # MRP READ
+    @http.route(['/tiamericas/mrp','/tiamericas/mrp/<mrp_id>'], auth="public", type="http")
+    def mrp(self, mrp_id = None, **post):
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)  
+        if current_user:
+            filtro = '[]'
+            # product_model = request.env['product.product']
+            if mrp_id:
+                filtro = [('id','=',mrp_id)]
+                mrp_ids = request.env['mrp.production'].sudo().search(filtro)
+            else:
+                mrp_ids = request.env['mrp.production'].sudo().search([])   
+          
+            if not mrp_ids:
+                res_json = json.dumps({'error': _('MO no encontrado')})
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res_json)
+            else:
+                rp = {}
+                json_dict = []
+                fields_mrp_line = ('id','name','product_uom_qty','quantity_done','product_id')
+                # fields_mrp_line = ('product_id','id')
+
+                for mrp in mrp_ids:
+                    # Ensamblando registro
+                    rp = {
+                            'id': mrp.id,
+                            'name': mrp.name,
+                            'as_sale': self.obj_to_json(mrp.as_sale),
+                            'product_id': self.obj_to_json(mrp.product_id),
+                            'product_qty': mrp.product_qty,
+                            # 'bom_name': mrp.bom_id.product_tmpl_id.name,
+                            # 'bom_id': mrp.bom_id.product_tmpl_id.id,
+                            
+                            'bom_id': self.obj_to_json(mrp.bom_id,('product_tmpl_id','id','product_qty','code')),
+
+                            'as_lot': self.obj_to_json(mrp.as_lot),
+                            'version': mrp.bom_id.version,
+                            'code': mrp.bom_id.code,
+                            'date_planned_start': str(mrp.date_planned_start),
+                            'origin': mrp.origin,
+                            'main_mo_id': self.obj_to_json(mrp.main_mo_id),
+                            'as_machine_id': self.obj_to_json(mrp.as_machine_id),
+                            'as_lote_numero': mrp.as_lote_numero,
+                            'as_lote_peso': mrp.as_lote_peso,
+                            'as_tanque': mrp.as_tanque,
+                            'move_raw_ids': self.obj_to_json(mrp.move_raw_ids,fields_mrp_line),
+                        }
+                    json_dict.append(rp)
+                res = json.dumps(json_dict)
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res)
+
+    # TOKEN
     @http.route('/tiamericas/get_token', type='json',  auth='user')
     def get_token(self, **post):        
         user = request.env['res.users'].sudo().browse(post['local_context']['uid'])
         res = user.get_token()
         return res
 
+    # TOKEN GENERATE
     # http://localhost:10000/tiamericas/token/?login=admin&password=123&db=ODOO12_APP
     @http.route(['/tiamericas/token',], auth="public", type="http", csrf=False)
     def token(self, **post):
@@ -140,14 +258,31 @@ class as_webservice(http.Controller):
             return '{0}({1})'.format(callback, res_json)
 
     # Convertir objeto a json
-    def obj_to_json(self, objeto):
+    # Fields debe tener al menos 2 valores
+    def obj_to_json(self, objeto, fields = None):
         json_dict = []
-        if objeto:
-            for child in objeto:
-                json_dict.append({
-                    "id": child.id,
-                    "name": child.name, #Nombre cliente
-                })
+        rp = {}
+        rp2 = []
+        if fields:
+            if objeto:
+                for child in objeto:
+                    rp = {}
+                    for field in fields:
+                        if isinstance(getattr(child, field), (float, int, str)):
+                            rp[field] = getattr(child, field)
+                        else:
+                            rp[field] = self.obj_to_json(getattr(child, field))
+                    rp2.append(rp)
+                json_dict.append(rp2)
+            else:
+                json_dict = {'error': _('Not found')}               
         else:
-            json_dict = {'error': _('Not found')}
+            if objeto:
+                for child in objeto:
+                    json_dict.append({
+                        "id": child.id,
+                        "name": child.name, #Nombre cliente
+                    })
+            else:
+                json_dict = {'error': _('Not found')}
         return json_dict
