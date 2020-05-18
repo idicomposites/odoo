@@ -27,9 +27,9 @@
                                                 </div>
 <br/>
 <div class="col-12 text-left">
-                                                <img t-att-src="image_data_uri(picking.get_qrcode(move.product_id.name+'-'+move.picking_id.name+'-'+picking.get_format(contador)))"
-                                                    style="max-height:2.5cm;max-width:2.5cm;" /><br/>
-                                                    <span t-esc="move.product_id.name+'-'+move.picking_id.name+'-'+picking.get_format(contador)" /><br/>
+                                                <img t-att-src="image_data_uri(picking.get_qrcode(str(move.product_id.default_code)+'-'+move.picking_id.name+'-'+picking.get_format(contador)))"
+                                                    style="max-height:3.5cm;max-width:3cm;" /><br/>
+                                                    <span style='font-size:12px' t-esc="str(move.product_id.default_code)+'-'+move.picking_id.name+'-'+picking.get_format(contador)" /><br/>
                     </div>
                                 <t t-set="contador" t-value="contador+1" />
                     <br/><br/>
