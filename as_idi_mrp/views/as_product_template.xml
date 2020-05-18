@@ -24,6 +24,7 @@
                             <field name="as_code" />
                             <field name="as_slogan" />
                             <field name="as_code_iso" />
+                            <field name="as_code_iso_lot" />
                           
                 </tree>
             </field>
@@ -45,6 +46,7 @@
                             <field name="as_slogan" />
                             <field name="as_code_iso" />
                             <field name="as_sfooter" />
+                            <field name="as_code_iso_lot" />
                             <field name="image" widget="image" class="oe_avatar"/>
                           
                         </group>

@@ -6,6 +6,7 @@
                 <div class="page">
                     <t t-foreach="docs" t-as="picking">
                         <t t-foreach="picking.move_lines" t-as="move">
+                            <t t-set="contador" t-value="1" />
                             <t t-foreach="move.move_line_ids" t-as="move_line">
                             <img t-att-src="image_data_uri(picking.company_id.logo)"
                                         style="height:40px; width: 150px;" />
@@ -14,31 +15,34 @@
                                 CODIGO INTERNO: <span t-esc="move.product_id.default_code" /><br/>
                                 MATERIAL: <span t-esc="move.product_id.name" /><br/>
                                 LOTE: <span t-esc="move_line.lot_name or move_line.lot_id.name" /><br/>
-                                FECHA: <span
-                                                t-esc="(datetime.datetime.strptime(str(picking.date_done), '%Y-%m-%d %H:%M:%S') - datetime.timedelta(hours=4)).strftime('%d/%m/%Y')" /><br/>
-                                OBS:TOTE CON  <t t-set="cantidad" t-value="int(move_line.qty_done)" /> <t t-set="cant" t-value="move_line.product_uom_id.name" /> <br/>
-                                INSPECTOR: <span t-esc="move.picking_id.user_id.partner_id.name" /><br/>
-                                USO EXCLUSIVO DEL MATERIAL:<br/>
-                                FECHA CADUCIDAD: <span
-                                                t-esc="(datetime.datetime.strptime(str(picking.scheduled_date), '%Y-%m-%d %H:%M:%S') - datetime.timedelta(hours=4)).strftime('%d/%m/%Y')" /><br/>
+                                FECHA: <t t-if="picking.date_done"><span t-esc="(datetime.datetime.strptime(str(picking.date_done), '%Y-%m-%d %H:%M:%S') - datetime.timedelta(hours=4)).strftime('%d/%m/%Y')" /><br/></t>
+                                OBS: <span t-esc="picking.get_pobs(move_line.lot_id.note)" /><br/>
+                                INSPECTOR: <span t-esc="picking.get_partner_id()" /><br/>
+                                FECHA CADUCIDAD: 
+                                <t t-if="move_line.lot_id.life_date">
+                                <span t-esc="(datetime.datetime.strptime(str(move_line.lot_id.life_date), '%Y-%m-%d %H:%M:%S')).strftime('%d/%m/%Y')" />
+                                </t> 
+                                
+                                <br/>
                                                 </div>
 <br/>
 <div class="col-12 text-left">
-                                                <img t-att-src="image_data_uri(picking.get_qrcode(move.picking_id.name))"
+                                                <img t-att-src="image_data_uri(picking.get_qrcode(move.product_id.name+'-'+move.picking_id.name+'-'+picking.get_format(contador)))"
                                                     style="max-height:2.5cm;max-width:2.5cm;" /><br/>
-                                                    <span t-esc="move.picking_id.name" /><br/>
+                                                    <span t-esc="move.product_id.name+'-'+move.picking_id.name+'-'+picking.get_format(contador)" /><br/>
                     </div>
-                    <br/>
+                                <t t-set="contador" t-value="contador+1" />
+                    <br/><br/>
                      <t t-if="picking.partner_id.as_internacional">
                      <div class="col-12 text-right">
-                                 <h2>IMMEX</h2>
+                                 <h2 style="font-size:50px">IMMEX</h2>
                             </div>
                                 </t>
-                                <br/><br/>
+                                <br/>
                         <br/>__________________________________________________  <br/>
                         <div class="row mt0 mb0 ">
                         <div class="col-6 text-left">Firma y Sello </div>
-                        <div class="col-6 text-left">CAL-F-10,REV.3</div>
+                        <div class="col-6 text-left"><span t-esc="move_line.product_id.product_tmpl_id.as_format_type_id.as_code_iso_lot" /></div>
                         </div>
                                 <p style="page-break-before:always;" />
 

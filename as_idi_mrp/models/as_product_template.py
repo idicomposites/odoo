@@ -22,5 +22,6 @@ class Productformat(models.Model):
     as_code = fields.Integer(string='Codigo/secuencia')
     as_slogan = fields.Text(string='Slogan')
     as_code_iso = fields.Char(string='Codigo ISO')
+    as_code_iso_lot = fields.Char(string='Codigo ISO lote')
     image = fields.Binary(attachment=True)
     as_sfooter = fields.Text(string='Footer')

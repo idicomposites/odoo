@@ -8,6 +8,7 @@ from dateutil import parser
 from datetime import datetime, timedelta, date
 #QR
 import qrcode
+from bs4 import BeautifulSoup
 import tempfile
 import base64
 from io import StringIO
@@ -33,3 +34,18 @@ class StockPicking(models.Model):
             return qr_img
         except:
             raise UserError(_('No se puedo generar el codigo QR'))
+
+    def get_format(self,number):
+        if number <10:
+            return '0'+str(number)
+        else:
+            return str(number)
+
+    def get_partner_id(self):
+        return self.env.user.partner_id.name
+
+    def get_pobs(self,text):
+        return BeautifulSoup(text,"html.parser").text
+    # def get_name_picking(self,move_id):
+    #     name=''
+    #     move_line_id = self.env['stock.move.line'].search([('id', '=', move_id)])

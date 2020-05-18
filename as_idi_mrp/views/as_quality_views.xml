@@ -9,7 +9,7 @@
             <field name="inherit_id" ref="quality_control.quality_check_view_form" />
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='do_fail']" position="after">
-                    <button name="%(report_certificate_idi)d" type="action" class="btn-primary" string="Imprimir Certificado"  attrs="{'invisible': [('quality_state', '!=', 'pass')]}"/>
+                    <!-- <button name="%(report_certificate_idi)d" type="action" class="btn-primary" string="Imprimir Certificado"  attrs="{'invisible': [('quality_state', '!=', 'pass')]}"/> -->
                 </xpath>
             </field>
         </record>
