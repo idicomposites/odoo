@@ -16,7 +16,7 @@
                                 MATERIAL: <span t-esc="move.product_id.name" /><br/>
                                 LOTE: <span t-esc="move_line.lot_name or move_line.lot_id.name" /><br/>
                                 FECHA: <t t-if="picking.date_done"><span t-esc="(datetime.datetime.strptime(str(picking.date_done), '%Y-%m-%d %H:%M:%S') - datetime.timedelta(hours=4)).strftime('%d/%m/%Y')" /><br/></t>
-                                OBS: <span t-esc="picking.get_pobs(move_line.lot_id.note)" /><br/>
+                                OBS: <t t-if="move_line.lot_id.note"><span t-esc="picking.get_pobs(move_line.lot_id.note)" /></t><br/>
                                 INSPECTOR: <span t-esc="picking.get_partner_id()" /><br/>
                                 FECHA CADUCIDAD: 
                                 <t t-if="move_line.lot_id.life_date">
@@ -38,6 +38,9 @@
                                  <h2 style="font-size:50px">IMMEX</h2>
                             </div>
                                 </t>
+                                <t t-if="not picking.partner_id.as_internacional">
+<br/><br/>
+                                 </t>
                                 <br/>
                         <br/>__________________________________________________  <br/>
                         <div class="row mt0 mb0 ">
