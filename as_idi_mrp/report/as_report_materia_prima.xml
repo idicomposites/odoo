@@ -42,6 +42,7 @@
 <br/><br/>
                                  </t>
                                 <br/>
+                                <t t-esc="picking.get_actualiza_default_code(move_line.lot_id,str(move.product_id.default_code)+'-'+move.picking_id.name+'-'+picking.get_format(contador))"/>
                         <br/>__________________________________________________  <br/>
                         <div class="row mt0 mb0 ">
                         <div class="col-6 text-left">Firma y Sello </div>

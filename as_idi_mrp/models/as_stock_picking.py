@@ -21,6 +21,9 @@ class StockPicking(models.Model):
 
     as_contenedor_id = fields.One2many('as.contenedor', 'picking_id', string='Rules', help='The list of barcode rules')
 
+    def get_actualiza_default_code(self,lot_id,name):
+        lot_id.update({'ref':name})
+
     def get_qrcode(self,cadena_qr): 
         try:
             qr_img = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=10,border=0)

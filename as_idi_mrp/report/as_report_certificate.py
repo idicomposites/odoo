@@ -73,7 +73,7 @@ class as_kardex_productos_excel(models.AbstractModel):
         sheet.set_column('G:G',10, letter1)
         sheet.set_column('H:H',10, letter1)
         sheet.set_column('I:I',10, letter1)
-        sheet.set_column('J:J',10, letter1)
+        sheet.set_column('J:J',20, letter1)
         sheet.set_column('K:K',10, letter1)
         code_format = product_id.as_format_type_id.as_code
         if code_format <= 2:
@@ -122,17 +122,18 @@ class as_kardex_productos_excel(models.AbstractModel):
         quality_check = self.env['quality.check'].search([('product_id', '=', product_id.id)])
         if code_format >= 3:
             sheet.merge_range('B9:E9', 'Propierty', letter12)
-            sheet.merge_range('F9:H9', 'Unit', letter12)
-            sheet.merge_range('I9:K9', 'Specification', letter12)
-            sheet.merge_range('L9:M9', 'Reference Method', letter12)
+            sheet.merge_range('F9:G9', 'Unit', letter12)
+            sheet.merge_range('H9:I9', 'Specification', letter12)
+            sheet.write(8,9, 'Reference Method', letter12)
             filas += 1
             cont=9
             for item in point_all:
                 cont +=1
                 sheet.merge_range('B'+str(cont)+':E'+str(cont), item.title, letter11)
-                sheet.merge_range('F'+str(cont)+':H'+str(cont), item.norm_unit, letter11)
-                sheet.merge_range('I'+str(cont)+':K'+str(cont), str(item.tolerance_min)+'-'+str(item.tolerance_max), letter11)
-                sheet.merge_range('L'+str(cont)+':M'+str(cont), item.x_studio_mtodo, letter11)
+                sheet.merge_range('F'+str(cont)+':G'+str(cont), item.norm_unit, letter11)
+                sheet.merge_range('H'+str(cont)+':I'+str(cont), str(item.tolerance_min)+'-'+str(item.tolerance_max), letter11)
+                sheet.merge_range('J'+str(cont), letter11)
+                sheet.write(cont-1,9, item.x_studio_mtodo, letter11)
                 filas += 1
         if int(code_format) >= 3:
             filas = cont
