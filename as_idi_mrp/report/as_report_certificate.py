@@ -91,7 +91,7 @@ class as_kardex_productos_excel(models.AbstractModel):
         if mo_id:
             customer=mo_id.as_sale.partner_id.name
         sheet.write(3, 1, 'Material: ',letter1) 
-        sheet.write(3, 2, product_id.default_code,letter2)         
+        sheet.write(3, 2, product_id.name,letter2)         
         sheet.write(4, 1, 'Color: ',letter1) 
         sheet.write(4, 2, product_id.as_color,letter2) 
         sheet.write(5, 1, 'Customer: ',letter1) 
