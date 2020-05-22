@@ -26,9 +26,10 @@ def as_convert(txt,digits=50,is_number=False):
 
 class as_webservice(http.Controller):
 
-    # Clientes WRITE
     '''
+    Clientes WRITE
     {
+        "id":123,
         "token":"c70bf37cbc0f4d758cc4651b4f999c6c",
         "name":"1111Test",
         "phone":"1111",
@@ -72,108 +73,216 @@ class as_webservice(http.Controller):
         callback = post.get('callback')
         return '{0}({1})'.format(callback, res_json)
 
-    # PRODUCTOS WRITE
-    # @http.route(['/tiamericas/productos','/tiamericas/productos/<product_id>'], auth="public", type="http")
-    # def product(self, product_id = None, **post):
-    #     el_token = post.get('token') or 'sin_token'
-    #     current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
-    #     if not current_user:
-    #         res_json = json.dumps({'error': ('Token Invalido')})
-    #         callback = post.get('callback')
-    #         return '{0}({1})'.format(callback, res_json)  
-    #     if current_user:
-    #         filtro = '[]'
-    #         # product_model = request.env['product.product']
-    #         if product_id:
-    #             filtro = [('id','=',product_id)]
-    #             product_ids = request.env['product.template'].sudo().search(filtro)
-    #         else:
-    #             product_ids = request.env['product.template'].sudo().search([])   
-          
-    #         if not product_ids:
-    #             res_json = json.dumps({'error': _('Producto no encontrado')})
-    #             callback = post.get('callback')
-    #             return '{0}({1})'.format(callback, res_json)
-    #         else:
-    #             rp = {}
-    #             json_dict = []
+    '''
+    PRODUCTOS WRITE
+    {
+    "product_id": 1425,
+    "name": "Papa Frita3",
+    "type": "product",
+    "categ_id": 1,
+    "as_tipo_producto_idi": "bmc",
+    "color": "rosado",
+    "default_code": "cod-111-abc",
+    "codigo_barras": "1234567893",
+    "precio_venta": 111.11,
+    "costo": 111.11,
+    "taxes_id": 1,
+    "uom_id": 3,
+    "uom_po_id": 3,
+    "token": "c70bf37cbc0f4d758cc4651b4f999c6c",
+    "purchase_ok": true,
+    "sale_ok": true
+    }
+    '''
+    @http.route(["/tiamericas/productos/write/"], auth='public', type="json", methods=['POST'],csrf=False)
+    def product(self, product_id = None, **pdata):
+        post = yaml.load(request.httprequest.data)
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)  
+        if current_user:
+            if post:
+                product = int(post.get('product_id')) if post.get('product_id') else 0
+                current_product = request.env['product.template'].sudo().search([('id', '=', product)])
+                res = {}
+                product_data = {
+                    "name": as_convert(post.get('name') or ""),
+                    "type": as_convert(post.get('type') or ""),
+                    "categ_id": (post.get('categ_id') or ""),
+                    "as_tipo_producto_idi": as_convert(post.get('tipo_producto_idi') or ""),
+                    "as_color": as_convert(post.get('color') or ""),
+                    "default_code": as_convert(post.get('default_code') or ""),
+                    "barcode": as_convert(post.get('codigo_barras') or ""),
+                    "list_price": float(post.get('precio_venta') or 0),
+                    "standard_price": float(post.get('costo') or 0),
+                    "taxes_id": [[6, False, [int(post.get('taxes_id') or 0)]]],
+                    "uom_id": int(post.get('uom_id') or 0),
+                    "uom_po_id": int(post.get('uom_po_id') or 0),
+                    "purchase_ok": (post.get('purchase_ok') or False),
+                    "sale_ok": (post.get('sale_ok') or False),
+                }
+                if not current_product:
+                    new_id = request.env['product.template'].sudo().create(product_data)
+                    res['status'] = 'Create Successfully'
+                    res['id'] = new_id.id
+                    res_json = json.dumps(res)
+                elif current_product:
+                    current_product.update(product_data)
+                    res['status'] = 'Update Successfully'
+                    res['id'] = current_product.id
+                    res_json = json.dumps(res)
+        callback = post.get('callback')
+        return '{0}({1})'.format(callback, res_json)
 
-    #             for product in product_ids:  
-    #                 rp = {
-    #                         'id': product.id,
-    #                         'nombre': product.name,
-    #                         'tipo_producto': product.type,
-    #                         'categoria_producto': self.obj_to_json(product.categ_id),
-    #                         'tipo_producto_idi': product.as_tipo_producto_idi,
-    #                         'color': product.as_color,
-    #                         'referencia_interna': product.default_code,
-    #                         'codigo_barras': product.barcode,
-    #                         'precio_venta':	product.list_price,
-    #                         'costo': product.standard_price,
-    #                         'impuestos_cliente': self.obj_to_json(product.taxes_id),
-    #                         'unidad_medida': self.obj_to_json(product.uom_id),
-    #                         'unidad_medida_compra':	self.obj_to_json(product.uom_po_id),
-    #                     }
-    #                 json_dict.append(rp)
-    #             res = json.dumps(json_dict)
-    #             callback = post.get('callback')
-    #             return '{0}({1})'.format(callback, res)
+    # BOM WRITE
+    '''
+    {
+        "bom_id": 24906,
+        "product_tmpl_id": 1423,
+        "product_qty": 1.3,
+        "code": "Referencia X2",
+        "type": "normal",
+        "token": "c70bf37cbc0f4d758cc4651b4f999c6c",
+        "bom_line_ids":[
+            {
+            "product_id": 10,
+            "product_qty": 667,
+            "sequence": 1
+            },
+            {
+            "product_id": 1,
+            "product_qty": 777,
+            "sequence": 2
+            },
+            {
+            "product_id": 1411,
+            "product_qty": 888,
+            "sequence": 3
+            }
+        ]
+    }
+    '''
+    @http.route(["/tiamericas/bom/write/"], auth='public', type="json", methods=['POST'],csrf=False)
+    def bom(self, bom_id = None, **pdata):
+        post = yaml.load(request.httprequest.data)
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)
+        if current_user:
+            if post:
+                bom = int(post.get('bom_id')) if post.get('bom_id') else 0
+                current_boom = request.env['mrp.bom'].sudo().search([('id', '=', bom)])
+                res = {}
+                bom_data = {
+                    'product_tmpl_id': int(post.get('product_tmpl_id') or 0),
+                    'product_qty': float(post.get('product_qty') or 0),
+                    'code': as_convert(post.get('code') or ""),
+                    'type': as_convert(post.get('type') or ""),
+                    'bom_line_ids':  [(0, 0, line) for line in post.get('bom_line_ids')], # INSERTAR VARIAS LINEAS A MODELO
+                }
+                if not current_boom:
+                    new_id = request.env['mrp.bom'].sudo().create(bom_data)
+                    res['status'] = 'Create Successfully'
+                    res['id'] = new_id.id
+                    res_json = json.dumps(res)
+                elif current_boom:
+                    unlink_bom_lines = request.env['mrp.bom.line'].sudo().search([('bom_id', '=', current_boom.id)]).unlink()
 
-    # # BOM WRITE
-    # @http.route(['/tiamericas/bom','/tiamericas/bom/<bom_id>'], auth="public", type="http")
-    # def bom(self, bom_id = None, **post):
-    #     el_token = post.get('token') or 'sin_token'
-    #     current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
-    #     if not current_user:
-    #         res_json = json.dumps({'error': ('Token Invalido')})
-    #         callback = post.get('callback')
-    #         return '{0}({1})'.format(callback, res_json)  
-    #     if current_user:
-    #         filtro = '[]'
-    #         # product_model = request.env['product.product']
-    #         if bom_id:
-    #             filtro = [('id','=',bom_id)]
-    #             bom_ids = request.env['mrp.bom'].sudo().search(filtro)
-    #         else:
-    #             bom_ids = request.env['mrp.bom'].sudo().search([])   
-          
-    #         if not bom_ids:
-    #             res_json = json.dumps({'error': _('BOM no encontrado')})
-    #             callback = post.get('callback')
-    #             return '{0}({1})'.format(callback, res_json)
-    #         else:
-    #             rp = {}
-    #             json_dict = []
+                    current_boom.update(bom_data)
+                    res['status'] = 'Update Successfully'
+                    res['id'] = current_boom.id
+                    res_json = json.dumps(res)
+        callback = post.get('callback')
+        return '{0}({1})'.format(callback, res_json)
 
-    #             for bom in bom_ids:
-    #                 # ensamblar lines
-    #                 bom_line = request.env['mrp.bom.line']
-    #                 bom_lines = bom_line.sudo().search([('bom_id','=',bom.id)])
-    #                 bom_line_json_dict = []
-    #                 if bom_lines:
-    #                     for bom_line in bom_lines:
-    #                         bom_line_json_dict.append({
-    #                             "id":bom_line.id,
-    #                             "product_id":self.obj_to_json(bom_line.product_id),
-    #                             "product_qty":bom_line.product_qty,
-    #                             "sequence":bom_line.sequence,
-    #                         })
-    #                 else:
-    #                     bom_line_json_dict = {'error': _('Sin lineas')}
+    # MRP WRITE
+    '''
+    {
+        "mrp_id": 123,
+        "name": "127",
+        "as_sale": 1,
+        "product_id": 686,
+        "bom_id": 1,
+        "as_lot": 1,
+        "date_planned_start": "2020-01-10",
+        "main_mo_id": 1,
+        "as_lote_numero": 123,
+        "as_lote_peso": 123.123,
+        "as_tanque": 123,
+        "token": "c70bf37cbc0f4d758cc4651b4f999c6c",
+        "product_uom_id": 3
+    }
+    '''
+    @http.route(["/tiamericas/mrp/write/"], auth='public', type="json", methods=['POST'],csrf=False)
+    def mrp(self, bom_id = None, **pdata):
+        post = yaml.load(request.httprequest.data)
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)
+        if current_user:
+            if post:
+                mrp = int(post.get('mrp_id')) if post.get('mrp_id') else 0
+                current_mrp = request.env['mrp.production'].sudo().search([('id', '=', mrp)])
+                res = {}
+                mrp_data = {
+                    'name': as_convert(post.get('name') or ""),
+                    'as_sale': int(post.get('as_sale') or ""),
+                    'product_id': int(post.get('product_id') or ""),
+                    'bom_id': int(post.get('bom_id') or ""),
+                    'as_lot': int(post.get('as_lot') or ""),
+                    'date_planned_start': as_convert(post.get('date_planned_start') or ""),
+                    'main_mo_id': int(post.get('main_mo_id') or ""),
+                    'as_lote_numero': int(post.get('as_lote_numero') or ""),
+                    'as_lote_peso': float(post.get('as_lote_peso') or ""),
+                    'as_tanque': int(post.get('as_tanque') or ""),
+                    'product_uom_id': int(post.get('product_uom_id') or ""),
+                    # 'move_raw_ids': "",
 
-    #                 # Ensamblando registro
-    #                 rp = {
-    #                         'id': bom.id,
-    #                         'product_tmpl_id': self.obj_to_json(bom.product_tmpl_id),
-    #                         'product_qty': bom.product_qty,
-    #                         'code': bom.code,
-    #                         'type': bom.type,
-    #                         'bom_lines': bom_line_json_dict,
-    #                     }
-    #                 json_dict.append(rp)
-    #             res = json.dumps(json_dict)
-    #             callback = post.get('callback')
-    #             return '{0}({1})'.format(callback, res)
+                }
+
+                if not current_mrp:
+                    new_id = request.env['mrp.production'].sudo().create(mrp_data)
+                    new_id.sudo()._onchange_move_raw()
+                    new_id.sudo()._onchange_bom_id()
+                    new_id.sudo().onchange_product_id()
+                    new_id.sudo()._onchange_date_planned_start()
+                    res['status'] = 'Create Successfully'
+                    res['id'] = new_id.id
+                    res_json = json.dumps(res)
+                elif current_mrp:
+                    unlink_bom_lines = request.env['mrp.production.line'].sudo().search([('mrp_id', '=', current_mrp.id)]).unlink()
+
+                    current_mrp.update(mrp_data)
+                    res['status'] = 'Update Successfully'
+                    res['id'] = current_mrp.id
+                    res_json = json.dumps(res)
+        callback = post.get('callback')
+        return '{0}({1})'.format(callback, res_json)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # # MRP WRITE
     # @http.route(['/tiamericas/mrp','/tiamericas/mrp/<mrp_id>'], auth="public", type="http")
