@@ -263,6 +263,73 @@ class as_webservice(http.Controller):
                 callback = post.get('callback')
                 return '{0}({1})'.format(callback, res)
 
+    # SALE READ
+    @http.route(['/tiamericas/sale','/tiamericas/sale/<sale_id>'], auth="public", type="http")
+    def sale(self, sale_id = None, **post):
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)  
+        if current_user:
+            filtro = '[]'
+            # product_model = request.env['product.product']
+            if sale_id:
+                filtro = [('id','=',sale_id)]
+                sale_ids = request.env['sale.order'].sudo().search(filtro)
+            else:
+                sale_ids = request.env['sale.order'].sudo().search([('state','=','done')])
+          
+            if not sale_ids:
+                res_json = json.dumps({'error': _('SO no encontrado')})
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res_json)
+            else:
+                rp = {}
+                json_dict = []
+                fields_sale_line = (
+                    'id',
+                    'name',
+                    'as_machine_id',
+                    'as_lote_numero',
+                    'as_lote_peso',
+                    'as_tanque',
+                    'move_raw_ids',
+                    'state',
+                    # 'product_uom_qty',
+                    # 'quantity_done'
+                    )
+
+                fields_sale_line2 = (
+                    'id',
+                    'name',
+                    'product_id',
+                    'product_uom_qty',
+                    'quantity_done'
+                    )                    
+                
+                # fields_sale_line = ('product_id','id')
+
+                for sale in sale_ids:
+                    
+                    # MOs
+                    mos = request.env['mrp.production'].sudo().search([('as_sale', '=', sale.id),('state','in',['done','confirmed'])])
+
+                    # Ensamblando registro
+                    rp = {
+                            'id': sale.id,
+                            'name': sale.name,
+                            # 'origin': sale.origin,
+                            # 'picking_type_id': self.obj_to_json(sale.picking_type_id),
+                            # 'date_done': str(sale.date_done),
+                            'mo_ids': self.obj_to_json(mos,fields_sale_line,fields_sale_line2),
+                        }
+                    json_dict.append(rp)
+                res = json.dumps(json_dict)
+                callback = post.get('callback')
+                return '{0}({1})'.format(callback, res)
+
     # TOKEN
     @http.route('/tiamericas/get_token', type='json',  auth='user')
     def get_token(self, **post):        
@@ -300,7 +367,7 @@ class as_webservice(http.Controller):
 
     # Convertir objeto a json
     # Fields debe tener al menos 2 valores
-    def obj_to_json(self, objeto, fields = None):
+    def obj_to_json(self, objeto, fields = None, fields2 = None):
         json_dict = []
         rp = {}
         rp2 = []
@@ -312,7 +379,10 @@ class as_webservice(http.Controller):
                         if isinstance(getattr(child, field), (float, int, str)):
                             rp[field] = getattr(child, field)
                         else:
-                            rp[field] = self.obj_to_json(getattr(child, field))
+                            if fields2 and field == 'move_raw_ids':
+                                rp[field] = self.obj_to_json(getattr(child, field), fields2)
+                            else:
+                                rp[field] = self.obj_to_json(getattr(child, field))
                     rp2.append(rp)
                 json_dict.append(rp2)
             else:

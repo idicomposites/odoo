@@ -246,7 +246,6 @@ class as_webservice(http.Controller):
                     'as_tanque': int(post.get('as_tanque') or ""),
                     'product_uom_id': int(post.get('product_uom_id') or ""),
                     # 'move_raw_ids': "",
-
                 }
 
                 if not current_mrp:
@@ -254,6 +253,9 @@ class as_webservice(http.Controller):
                     new_id.sudo()._onchange_move_raw()
                     new_id.sudo()._onchange_bom_id()
                     new_id.sudo().onchange_product_id()
+                    new_id.sudo().onchange_company_id()
+                    new_id.sudo().onchange_picking_type()
+                    
                     new_id.sudo()._onchange_date_planned_start()
                     res['status'] = 'Create Successfully'
                     res['id'] = new_id.id
