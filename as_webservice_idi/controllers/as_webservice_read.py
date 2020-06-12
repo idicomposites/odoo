@@ -276,10 +276,10 @@ class as_webservice(http.Controller):
             filtro = '[]'
             # product_model = request.env['product.product']
             if sale_id:
-                filtro = [('id','=',sale_id)]
+                filtro = [('id','=',sale_id),('state','=','sale')]
                 sale_ids = request.env['sale.order'].sudo().search(filtro)
             else:
-                sale_ids = request.env['sale.order'].sudo().search([('state','=','done')])
+                sale_ids = request.env['sale.order'].sudo().search([('state','=','sale')])
           
             if not sale_ids:
                 res_json = json.dumps({'error': _('SO no encontrado')})
