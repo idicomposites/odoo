@@ -165,8 +165,8 @@ class as_webservice(http.Controller):
                 return '{0}({1})'.format(callback, res)
 
     # MRP READ
-    @http.route(['/tiamericas/mrp','/tiamericas/mrp/<mrp_id>'], auth="public", type="http")
-    def mrp(self, mrp_id = None, **post):
+    @http.route(['/tiamericas/mrp','/tiamericas/mrp/<mrp_id>','/tiamericas/mrp/so/<so_id>'], auth="public", type="http")
+    def mrp(self, mrp_id = None, so_id = None, **post):
         el_token = post.get('token') or 'sin_token'
         current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
         if not current_user:
@@ -175,9 +175,13 @@ class as_webservice(http.Controller):
             return '{0}({1})'.format(callback, res_json)  
         if current_user:
             filtro = '[]'
-            # product_model = request.env['product.product']
+            
+            # Filtro por MO
             if mrp_id:
                 filtro = [('id','=',mrp_id)]
+                mrp_ids = request.env['mrp.production'].sudo().search(filtro)
+            elif so_id:
+                filtro = [('as_sale','=',int(so_id))]
                 mrp_ids = request.env['mrp.production'].sudo().search(filtro)
             else:
                 mrp_ids = request.env['mrp.production'].sudo().search([])   
@@ -276,10 +280,10 @@ class as_webservice(http.Controller):
             filtro = '[]'
             # product_model = request.env['product.product']
             if sale_id:
-                filtro = [('id','=',sale_id),('state','=','sale')]
+                filtro = [('id','=',sale_id)]
                 sale_ids = request.env['sale.order'].sudo().search(filtro)
             else:
-                sale_ids = request.env['sale.order'].sudo().search([('state','=','sale')])
+                sale_ids = request.env['sale.order'].sudo().search([])
           
             if not sale_ids:
                 res_json = json.dumps({'error': _('SO no encontrado')})
@@ -314,7 +318,7 @@ class as_webservice(http.Controller):
                 for sale in sale_ids:
                     
                     # MOs
-                    mos = request.env['mrp.production'].sudo().search([('as_sale', '=', sale.id),('state','in',['done','confirmed'])])
+                    mos = request.env['mrp.production'].sudo().search([('as_sale', '=', sale.id)])
 
                     # Ensamblando registro
                     rp = {
