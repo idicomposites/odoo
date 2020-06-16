@@ -270,155 +270,89 @@ class as_webservice(http.Controller):
         callback = post.get('callback')
         return '{0}({1})'.format(callback, res_json)
 
+    # CONTENEDOR WRITE
+    '''
+    {
+    "id": 26,
+    "token": "c70bf37cbc0f4d758cc4651b4f999c6c",
+    "as_contenedor_id":[
+        {
+        "name": "127",
+        "as_peso": 1,
+        "as_lote": 686
+        },
+        {
+        "name": "128",
+        "as_peso": 2,
+        "as_lote": 687
+        }
+    ]
+    }
+    '''
+    @http.route(["/tiamericas/wh/contenedor/"], auth='public', type="json", methods=['POST'],csrf=False)
+    def mrp(self, bom_id = None, **pdata):
+        post = yaml.load(request.httprequest.data)
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)
+        if current_user:
+            if post:
+                wh = int(post.get('id')) if post.get('id') else 0
+                current_picking = request.env['stock.picking'].sudo().search([('id', '=', wh)])
+                
+                res = {}
+                wh_data = {
+                    'as_contenedor_id':  [(0, 0, line) for line in post.get('as_contenedor_id')]
+                }
 
+                if current_picking:
+                    unlink_as_contenedor_id_lines = request.env['as.contenedor'].sudo().search([('picking_id', '=', current_picking.id)]).unlink()
 
+                    current_picking.update(wh_data)
+                    res['status'] = 'Update Successfully'
+                    res['id'] = current_picking.id
+                    res_json = json.dumps(res)
+        callback = post.get('callback')
+        return '{0}({1})'.format(callback, res_json)
 
+    # MRP QTY DONE WRITE
+    '''
+    {
+        "id": 123,
+        "token": "c70bf37cbc0f4d758cc4651b4f999c6c",
+        "quantity_done": 111
+    }
+    '''
+    @http.route(["/tiamericas/mrp/consumido/"], auth='public', type="json", methods=['POST'],csrf=False)
+    def mrp(self, bom_id = None, **pdata):
+        post = yaml.load(request.httprequest.data)
+        el_token = post.get('token') or 'sin_token'
+        current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        if not current_user:
+            res_json = json.dumps({'error': ('Token Invalido')})
+            callback = post.get('callback')
+            return '{0}({1})'.format(callback, res_json)
+        if current_user:
+            if post:
+                quantity_done = int(post.get('quantity_done')) if post.get('quantity_done') else 0
+                wh = int(post.get('id')) if post.get('id') else 0
+                current_move = request.env['stock.move'].sudo().search([('id', '=', wh)])
+                
+                res = {}
+                wh_data = {
+                    'quantity_done':  quantity_done
+                }
 
-
-
-
-
-
-
-
-
-
-
-
-
-    # # MRP WRITE
-    # @http.route(['/tiamericas/mrp','/tiamericas/mrp/<mrp_id>'], auth="public", type="http")
-    # def mrp(self, mrp_id = None, **post):
-    #     el_token = post.get('token') or 'sin_token'
-    #     current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
-    #     if not current_user:
-    #         res_json = json.dumps({'error': ('Token Invalido')})
-    #         callback = post.get('callback')
-    #         return '{0}({1})'.format(callback, res_json)  
-    #     if current_user:
-    #         filtro = '[]'
-    #         # product_model = request.env['product.product']
-    #         if mrp_id:
-    #             filtro = [('id','=',mrp_id)]
-    #             mrp_ids = request.env['mrp.production'].sudo().search(filtro)
-    #         else:
-    #             mrp_ids = request.env['mrp.production'].sudo().search([])   
-          
-    #         if not mrp_ids:
-    #             res_json = json.dumps({'error': _('MO no encontrado')})
-    #             callback = post.get('callback')
-    #             return '{0}({1})'.format(callback, res_json)
-    #         else:
-    #             rp = {}
-    #             json_dict = []
-    #             fields_mrp_line = ('id','name','product_uom_qty','quantity_done','product_id')
-    #             # fields_mrp_line = ('product_id','id')
-
-    #             for mrp in mrp_ids:
-    #                 # Ensamblando registro
-    #                 rp = {
-    #                         'id': mrp.id,
-    #                         'name': mrp.name,
-    #                         'as_sale': self.obj_to_json(mrp.as_sale),
-    #                         'product_id': self.obj_to_json(mrp.product_id),
-    #                         'product_qty': mrp.product_qty,
-    #                         # 'bom_name': mrp.bom_id.product_tmpl_id.name,
-    #                         # 'bom_id': mrp.bom_id.product_tmpl_id.id,
-    #                         'bom_id': self.obj_to_json(mrp.bom_id,('product_tmpl_id','id','product_qty','code')),
-    #                         'as_lot': self.obj_to_json(mrp.as_lot),
-    #                         'version': mrp.bom_id.version,
-    #                         'code': mrp.bom_id.code,
-    #                         'date_planned_start': str(mrp.date_planned_start),
-    #                         'origin': mrp.origin,
-    #                         'main_mo_id': self.obj_to_json(mrp.main_mo_id),
-    #                         'as_machine_id': self.obj_to_json(mrp.as_machine_id),
-    #                         'as_lote_numero': mrp.as_lote_numero,
-    #                         'as_lote_peso': mrp.as_lote_peso,
-    #                         'as_tanque': mrp.as_tanque,
-    #                         'move_raw_ids': self.obj_to_json(mrp.move_raw_ids,fields_mrp_line),
-    #                     }
-    #                 json_dict.append(rp)
-    #             res = json.dumps(json_dict)
-    #             callback = post.get('callback')
-    #             return '{0}({1})'.format(callback, res)
-
-    # # STOCK WRITE
-    # @http.route(['/tiamericas/stock','/tiamericas/stock/<stock_id>'], auth="public", type="http")
-    # def stock(self, stock_id = None, **post):
-    #     el_token = post.get('token') or 'sin_token'
-    #     current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
-    #     if not current_user:
-    #         res_json = json.dumps({'error': ('Token Invalido')})
-    #         callback = post.get('callback')
-    #         return '{0}({1})'.format(callback, res_json)  
-    #     if current_user:
-    #         filtro = '[]'
-    #         # product_model = request.env['product.product']
-    #         if stock_id:
-    #             filtro = [('id','=',stock_id)]
-    #             stock_ids = request.env['stock.picking'].sudo().search(filtro)
-    #         else:
-    #             stock_ids = request.env['stock.picking'].sudo().search([])
-          
-    #         if not stock_ids:
-    #             res_json = json.dumps({'error': _('MO no encontrado')})
-    #             callback = post.get('callback')
-    #             return '{0}({1})'.format(callback, res_json)
-    #         else:
-    #             rp = {}
-    #             json_dict = []
-    #             fields_stock_line = ('id','name','as_peso','as_lote')
-    #             # fields_stock_line = ('product_id','id')
-
-    #             for stock in stock_ids:
-    #                 # Ensamblando registro
-    #                 rp = {
-    #                         'id': stock.id,
-    #                         'name': stock.name,
-    #                         'origin': stock.origin,
-    #                         'picking_type_id': self.obj_to_json(stock.picking_type_id),
-    #                         'date_done': str(stock.date_done),
-    #                         'as_contenedor_id': self.obj_to_json(stock.as_contenedor_id,fields_stock_line),
-    #                     }
-    #                 json_dict.append(rp)
-    #             res = json.dumps(json_dict)
-    #             callback = post.get('callback')
-    #             return '{0}({1})'.format(callback, res)
-
-    # # TOKEN
-    # @http.route('/tiamericas/get_token', type='json',  auth='user')
-    # def get_token(self, **post):        
-    #     user = request.env['res.users'].sudo().browse(post['local_context']['uid'])
-    #     res = user.get_token()
-    #     return res
-
-    # # TOKEN GENERATE
-    # # http://localhost:10000/tiamericas/token/?login=admin&password=123&db=ODOO12_APP
-    # @http.route(['/tiamericas/token',], auth="public", type="http", csrf=False)
-    # def token(self, **post):
-    #     """
-    #         Para autenticar se deben enviar usuario y password
-    #         servidor.com:8069/tiamericas/token?login=admin&password=admin
-    #     """
-    #     res = {}
-    #     try:
-    #         uid = request.session.authenticate(request.params['db'], request.params['login'], request.params['password'])
-    #         if uid:
-    #             user = request.env['res.users'].sudo().browse(uid)
-    #             token = user.get_user_access_token()
-    #             user.as_token = token
-    #             res['token'] = token
-    #             request.session.logout()
-    #         else:
-    #             res['error'] = "Login o Password erroneo"
-    #         res_json = json.dumps(res)
-    #         callback = post.get('callback')
-    #         return '{0}({1})'.format(callback, res_json)
-    #     except:
-    #         res['error'] = "Envia login y password"
-    #         res_json = json.dumps(res)
-    #         callback = post.get('callback')
-    #         return '{0}({1})'.format(callback, res_json)
+                if current_move:
+                    current_move.update(wh_data)
+                    res['status'] = 'Update Successfully'
+                    res['id'] = current_move.id
+                    res_json = json.dumps(res)
+        callback = post.get('callback')
+        return '{0}({1})'.format(callback, res_json)
 
     # Convertir objeto a json
     # Fields debe tener al menos 2 valores
