@@ -290,7 +290,7 @@ class as_webservice(http.Controller):
     }
     '''
     @http.route(["/tiamericas/wh/contenedor/"], auth='public', type="json", methods=['POST'],csrf=False)
-    def mrp(self, bom_id = None, **pdata):
+    def whcontenedor(self, bom_id = None, **pdata):
         post = yaml.load(request.httprequest.data)
         el_token = post.get('token') or 'sin_token'
         current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
@@ -327,7 +327,7 @@ class as_webservice(http.Controller):
     }
     '''
     @http.route(["/tiamericas/mrp/consumido/"], auth='public', type="json", methods=['POST'],csrf=False)
-    def mrp(self, bom_id = None, **pdata):
+    def mrpconsumido(self, bom_id = None, **pdata):
         post = yaml.load(request.httprequest.data)
         el_token = post.get('token') or 'sin_token'
         current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
