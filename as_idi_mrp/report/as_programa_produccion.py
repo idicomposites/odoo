@@ -130,7 +130,7 @@ class as_kardex_productos_excel(models.AbstractModel):
                     formato = letter1
                 else:
                     formato = letter1c
-                fecha_inv =  (datetime.strptime(str(line[3]), '%Y-%m-%d') + relativedelta(days=5)).strftime('%m/%d/%Y')
+                fecha_inv =  (datetime.strptime(str(line[3]), '%Y-%m-%d') + relativedelta(days=5)).strftime('%d/%m/%Y')
                 sheet.write(filas,0,product.name,formato)
                 sheet.write(filas,1,product.default_code or '',formato)
                 sheet.write(filas,2,product.qty_available or 0,formato)
