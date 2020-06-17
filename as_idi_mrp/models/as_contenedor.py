@@ -15,5 +15,5 @@ class Contenedor(models.Model):
 
     name = fields.Char(string='Nombre Contenedor')
     as_peso = fields.Float(string='Peso Contenedor')
-    as_lote = fields.Char(string='Lote')
+    as_lote = fields.Many2one('stock.production.lot', 'Nro Lote')
     picking_id = fields.Many2one(comodel_name='stock.picking', string='Picking_id')
