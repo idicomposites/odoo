@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name' : "Ahorasoft MRP customizaciones",
-    'version' : "1.0.7",
+    'version' : "1.0.8",
     'author'  : "Ahorasoft",
     'description': """
 Customizaciones para IDI
@@ -10,7 +10,7 @@ Customizaciones para IDI
 Custom module for Latproject
     """,
     'category' : "MRP",
-    'depends' : ["mrp","product",'sale','purchase','stock','report_xlsx',],
+    'depends' : ["mrp","product",'sale','purchase','stock','report_xlsx','uom'],
     'website': 'http://www.ahorasoft.com',
     'data' : [
         'security/ir.model.access.csv',

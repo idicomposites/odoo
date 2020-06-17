@@ -14,6 +14,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     as_cantidad_mo = fields.Float('MO', compute='_get_lotes_lines')
+    as_order_partner = fields.Char(string='Nro orden cliente',required=True)
 
     def _get_lotes_lines(self):
         resultado = 0

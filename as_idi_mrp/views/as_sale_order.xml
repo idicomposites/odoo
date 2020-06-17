@@ -13,6 +13,9 @@
 					</button>
 					
 				</xpath>
+				<xpath expr="//field[@name='date_order']" position="after">
+					<field name="as_order_partner"/>
+				</xpath>
 			</field>
 		</record>
 	</data>
