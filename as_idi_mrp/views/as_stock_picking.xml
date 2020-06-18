@@ -10,7 +10,7 @@
                     <field name="as_contenedor_id">
                         <tree string="Contenedor" editable="bottom" create="true" delete="false">
                             <field name="name" />
-                            <field name="as_lote" />
+                            <field name="as_lote" widget="many2many_tags"/>
                              <field name="as_pesob_kg" />
                             <field name="as_peson_kg" />
                             <field name="as_pesob_lb" />

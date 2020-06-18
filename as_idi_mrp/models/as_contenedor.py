@@ -18,7 +18,7 @@ class Contenedor(models.Model):
     as_peson_kg = fields.Float(string='Peso Neto kg')    
     as_pesob_lb = fields.Float(string='Peso Bruto lb')
     as_peson_lb = fields.Float(string='Peso Neto lb')
-    as_lote = fields.Many2one('stock.production.lot', 'Nro Lote')
+    as_lote = fields.Many2many('stock.production.lot', string='Nro Lote')
     picking_id = fields.Many2one(comodel_name='stock.picking', string='Picking_id')
 
     @api.onchange('as_pesob_kg')

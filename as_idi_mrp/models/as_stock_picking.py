@@ -49,6 +49,31 @@ class StockPicking(models.Model):
 
     def get_pobs(self,text):
         return BeautifulSoup(text,"html.parser").text
+
+    def get_sale_name(self):
+        venta =''
+        sale = self.env['sale.order'].search([('name', '=', self.origin)],limit=1)
+        if sale:
+            venta = sale.as_order_partner
+        return venta
+
+    def totales(self):
+        as_pesob_kg = 0.0
+        as_peson_kg = 0.0
+        as_pesob_lb = 0.0
+        as_peson_lb = 0.0
+        for pick in self.as_contenedor_id:
+            as_pesob_kg = pick.as_pesob_kg
+            as_peson_kg = pick.as_peson_kg
+            as_pesob_lb = pick.as_pesob_lb
+            as_peson_lb = pick.as_peson_lb
+        vals = {
+            'as_pesob_kg': as_pesob_kg,
+            'as_peson_kg': as_peson_kg,
+            'as_pesob_lb': as_pesob_lb,
+            'as_peson_lb': as_peson_lb,
+        }
+        return vals
     # def get_name_picking(self,move_id):
     #     name=''
     #     move_line_id = self.env['stock.move.line'].search([('id', '=', move_id)])

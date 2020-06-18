@@ -33,7 +33,30 @@
                 <field name="header_line" eval="False" />
                 <field name="report_ids" eval="[(4, ref('as_idi_mrp.as_materia_prima_qweb_pdf'))]" />
         </record>
-
+        <report 
+        id="as_empaque_qweb_pdf" 
+        model="stock.picking" 
+        string="Lista de Empaque(PDF)"
+        report_type="qweb-pdf"
+        name="as_idi_mrp.empaque_view_pdf"
+        file="as_idi_mrp.empaque_view_pdf"
+        attachment_use="False" 
+        menu="True" />
+        <record id="as_empaque_package" model="report.paperformat">
+                <field name="name">Impresion Lista de empaque</field>
+                <field name="name">A4 Horizontal</field>
+                <field name="default" eval="True"/>
+                <field name="format">A4</field>
+                <field name="orientation">Landscape</field>
+                <field name="margin_top">30</field>
+                <field name="margin_bottom">10</field>
+                <field name="margin_right">4</field>
+                <field name="margin_left">4</field>
+                <field name="header_spacing">20</field>
+                <field name="dpi">90</field>
+                <field name="header_line" eval="False" />
+                <field name="report_ids" eval="[(4, ref('as_idi_mrp.as_empaque_qweb_pdf'))]" />
+        </record>
         
 
 </odoo>

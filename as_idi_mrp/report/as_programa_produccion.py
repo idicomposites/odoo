@@ -99,7 +99,7 @@ class as_kardex_productos_excel(models.AbstractModel):
             sheet.write(7, 3, 'UDM', titulo2)
             sheet.write(7, 4, 'DUE DATE', titulo2)
             sheet.write(7, 5, 'QTY REQUERED', titulo2)
-            sheet.write(7, 6, 'RBALANCE', titulo2)
+            sheet.write(7, 6, 'BALANCE', titulo2)
             filas = 8
             sheet.freeze_panes(8, 0)
             query_movements = ("""
@@ -113,7 +113,7 @@ class as_kardex_productos_excel(models.AbstractModel):
                     join mrp_product_forecast mpf on mps.id = mpf.production_schedule_id
                     join product_product pp on pp.id = mps.product_id
                     join product_template pt on pp.product_tmpl_id = pt.id
-                    order by pt.default_code,mpf.date
+                    order by pt.name,mpf.date
                     """)
             #_logger.debug(query_movements)
             self.env.cr.execute(query_movements)
