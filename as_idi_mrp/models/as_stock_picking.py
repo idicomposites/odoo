@@ -63,10 +63,10 @@ class StockPicking(models.Model):
         as_pesob_lb = 0.0
         as_peson_lb = 0.0
         for pick in self.as_contenedor_id:
-            as_pesob_kg = pick.as_pesob_kg
-            as_peson_kg = pick.as_peson_kg
-            as_pesob_lb = pick.as_pesob_lb
-            as_peson_lb = pick.as_peson_lb
+            as_pesob_kg += pick.as_pesob_kg
+            as_peson_kg += pick.as_peson_kg
+            as_pesob_lb += pick.as_pesob_lb
+            as_peson_lb += pick.as_peson_lb
         vals = {
             'as_pesob_kg': as_pesob_kg,
             'as_peson_kg': as_peson_kg,

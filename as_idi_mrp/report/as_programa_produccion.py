@@ -108,7 +108,8 @@ class as_kardex_productos_excel(models.AbstractModel):
                     pt.name,
                     pt.default_code,
                     mpf.date,
-                    mpf.replenish_qty 
+                    mpf.replenish_qty,
+                    mps.id
                     from mrp_production_schedule mps
                     join mrp_product_forecast mpf on mps.id = mpf.production_schedule_id
                     join product_product pp on pp.id = mps.product_id
@@ -121,22 +122,28 @@ class as_kardex_productos_excel(models.AbstractModel):
             movimientos_almacen = []
             
             for line in all_movimientos_almacen:
+                value_qty = 0.0
                 product = self.env['product.template'].search([('id', '=', line[0])], limit=1)
-                if line[4]:
-                    qty = float(product.qty_available)-float(line[4]) 
+                msp = self.env['mrp.production.schedule'].search([('id', '=', line[5])], limit=1).get_production_schedule_view_state()
+                for value in msp[0]['forecast_ids']:
+                    if str(line[3])== str(value['date_stop']):
+                        value_qty = value['replenish_qty']
+                if value_qty:
+                    qty = float(product.qty_available)-value_qty
                 else:
                     qty = float(product.qty_available)
                 if qty > 0:
                     formato = letter1
                 else:
                     formato = letter1c
+
                 fecha_inv =  (datetime.strptime(str(line[3]), '%Y-%m-%d') + relativedelta(days=5)).strftime('%d/%m/%Y')
                 sheet.write(filas,0,product.name,formato)
                 sheet.write(filas,1,product.default_code or '',formato)
                 sheet.write(filas,2,product.qty_available or 0,formato)
                 sheet.write(filas,3,product.uom_id.name or '',formato)
                 sheet.write(filas,4,fecha_inv,formato)
-                sheet.write(filas,5,line[4] or '',formato)
+                sheet.write(filas,5,value_qty or '',formato)
                 sheet.write(filas,6,qty or 0,formato)
                 filas += 1
 
