@@ -273,20 +273,26 @@ class as_webservice(http.Controller):
     # CONTENEDOR WRITE
     '''
     {
-    "id": 26,
+    "id": 10,
     "token": "c70bf37cbc0f4d758cc4651b4f999c6c",
     "as_contenedor_id":[
-        {
-        "name": "127",
-        "as_peso": 1,
-        "as_lote": 686
-        },
-        {
-        "name": "128",
-        "as_peso": 2,
-        "as_lote": 687
-        }
-    ]
+            {
+                "name": "1211",
+                "as_pesob_kg": 33.3,
+                "as_peson_kg": 31.1,
+                "as_pesob_lb": 34.4,
+                "as_peson_lb": 32.2,
+                "as_lote":[1,2,3]
+            },
+            {
+                "name": "2122",
+                "as_peson_kg": 41.11,
+                "as_peson_lb": 42.22,
+                "as_pesob_kg": 43.33,
+                "as_pesob_lb": 44.44,
+                "as_lote":[4,5,6]
+            }
+        ]
     }
     '''
     @http.route(["/tiamericas/wh/contenedor/"], auth='public', type="json", methods=['POST'],csrf=False)
@@ -337,7 +343,7 @@ class as_webservice(http.Controller):
             return '{0}({1})'.format(callback, res_json)
         if current_user:
             if post:
-                quantity_done = int(post.get('quantity_done')) if post.get('quantity_done') else 0
+                quantity_done = float(post.get('quantity_done')) if post.get('quantity_done') else 0
                 wh = int(post.get('id')) if post.get('id') else 0
                 current_move = request.env['stock.move'].sudo().search([('id', '=', wh)])
                 
