@@ -202,7 +202,7 @@ class as_webservice(http.Controller):
                             'id': mrp.id,
                             'name': mrp.name,
                             'as_sale': self.obj_to_json(mrp.as_sale),
-                            'as_order_sale': mrp.as_sale.as_order_partner,
+                            'as_order_partner': mrp.as_sale.as_order_partner,
                             'product_id': self.obj_to_json(mrp.product_id),
                             'product_qty': mrp.product_qty,
                             # 'bom_name': mrp.bom_id.product_tmpl_id.name,
