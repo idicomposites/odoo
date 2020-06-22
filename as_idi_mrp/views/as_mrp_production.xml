@@ -15,6 +15,17 @@
                 <field name="as_lot" />
                 <field name="as_sale" />
             </xpath>
+             <xpath expr="//notebook" position="inside">
+                <page string="Salidas" name="salidas">
+                    <field name="as_picking_id">
+                        <tree string="pickings" editable="bottom" create="0" delete="0">
+                            <field name="name" />
+                             <field name="state" />
+                            <field name="date_done" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
         </field>
     </record>
     <record id="as_mrp_production_tree" model="ir.ui.view">

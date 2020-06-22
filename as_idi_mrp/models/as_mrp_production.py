@@ -12,6 +12,14 @@ _logger = logging.getLogger(__name__)
 
 class as_mrp_workorder(models.Model):
     _inherit = "mrp.production"
+
+    # @api.depends('as_sale')
+    # def get_salidas_sales(self):
+    #     for mrp in self:
+    #         picking = self.env['stock.picking'].search([('origin', '=', mrp.origin)])
+    #         if picking:
+    #             mrp.as_picking_id = picking.ids
+
     
     as_machine_id = fields.Many2one(comodel_name='as.machine', string='Maquina')
     as_lote_numero = fields.Integer(string='Cantidad Lote')
@@ -20,6 +28,7 @@ class as_mrp_workorder(models.Model):
     as_sale = fields.Many2one('sale.order', 'Venta Origen', readonly=True)
     as_lot = fields.Many2one('stock.production.lot', 'Nro Lote',
     domain="[('product_id', '=', product_id), ('company_id', '=', company_id)]",readonly=True)
+    as_picking_id = fields.Many2many('stock.picking', string ='Salidas Relacionada a las ventas')
 
     def open_produce_product(self):
         self.ensure_one()
@@ -46,6 +55,7 @@ class as_mrp_workorder(models.Model):
     @api.depends('origen')
     def onchange_as_origen(self):
         sale = self.env['sale.order'].search([('name', '=', self.origin)])
+        picking = self.env['stock.picking'].search([('origin', '=', sale.name)])
         if sale:
             self.write({'as_sale':sale.id})
 

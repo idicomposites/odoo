@@ -24,6 +24,21 @@ class StockPicking(models.Model):
     def get_actualiza_default_code(self,lot_id,name):
         lot_id.update({'ref':name})
 
+    @api.model
+    def create(self, vals):
+        ids = []
+        picking = super(StockPicking, self).create(vals)
+        if picking:
+            sale = self.env['sale.order'].search([('name', '=', picking.origin)])
+            if sale:
+                mrps = self.env['mrp.production'].search([('origin', '=', sale.name)])
+                ids.append(picking.id)
+                pickings = self.env['stock.picking'].search([('origin', '=', sale.name)])
+                ids + pickings.ids
+                for mrp in mrps:
+                    mrp.as_picking_id=ids
+        return picking
+
     def get_qrcode(self,cadena_qr): 
         try:
             qr_img = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=10,border=0)
