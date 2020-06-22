@@ -194,6 +194,7 @@ class as_webservice(http.Controller):
                 rp = {}
                 json_dict = []
                 fields_mrp_line = ('id','name','product_uom_qty','quantity_done','product_id')
+                fields_mrp_line3 = ('id','name','state','date_done')
                 # fields_mrp_line = ('product_id','id')
 
                 for mrp in mrp_ids:
@@ -219,6 +220,7 @@ class as_webservice(http.Controller):
                             'as_lote_peso': mrp.as_lote_peso,
                             'as_tanque': mrp.as_tanque,
                             'move_raw_ids': self.obj_to_json(mrp.move_raw_ids,fields_mrp_line),
+                            'as_picking_id': self.obj_to_json(mrp.as_picking_id,fields_mrp_line3),
                         }
                     json_dict.append(rp)
                 res = json.dumps(json_dict)
