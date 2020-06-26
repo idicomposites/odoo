@@ -3,3 +3,4 @@
 
 from . import mrp_product_produce
 from . import as_programa_produccion
+from . import as_ordenes_pendientes

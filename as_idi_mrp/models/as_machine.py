@@ -17,4 +17,5 @@ class as_mrp_workorder(models.Model):
     name = fields.Char(string='Nombre')
     as_min = fields.Float(string='Capacidad Minima')
     as_max = fields.Float(string='Capacidad Maxima')
+    sequence_id = fields.Many2one("ir.sequence", string='Secuencia', ondelete='cascade')
 
