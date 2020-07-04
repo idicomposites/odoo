@@ -29,6 +29,13 @@ class as_mrp_workorder(models.Model):
     as_lot = fields.Many2one('stock.production.lot', 'Nro Lote',
     domain="[('product_id', '=', product_id), ('company_id', '=', company_id)]",readonly=True)
     as_picking_id = fields.Many2many('stock.picking', string ='Salidas Relacionada a las ventas')
+    as_cliente_venta = fields.Char(string='Cliente Venta')
+
+    def check_all_state_mo(self):
+        sales = self.env['mrp.production'].search([('state', '=','to_close')])
+        for mo in sales:
+            mo.write({'state':'done'})
+        return True
 
     def open_produce_product(self):
         self.ensure_one()

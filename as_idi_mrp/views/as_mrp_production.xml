@@ -13,6 +13,7 @@
             </xpath>
             <xpath expr="//field[@name='bom_id']" position="after">
                 <field name="as_lot" />
+                <field name="as_cliente_venta" />
                 <field name="as_sale" />
             </xpath>
              <xpath expr="//notebook" position="inside">
