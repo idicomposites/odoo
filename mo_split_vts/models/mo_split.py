@@ -11,6 +11,7 @@ class SplitManufactureOrder(models.TransientModel):
     def split_mo(self):
         #creacion anticipado del lote
         mo_obj = self.env['mrp.production']
+        copy_mo = mo_obj
         split_mo_based_on = self.env['ir.config_parameter'].sudo().get_param('mo_split_vts.mo_split_based_on')
         if self._context.get('active_id') and self._context.get('active_model')=='mrp.production':
             mo_id = mo_obj.browse(self.env.context['active_id'])
@@ -45,7 +46,10 @@ class SplitManufactureOrder(models.TransientModel):
                 self.generate_lot(copy_mo.id)
                 if sale:
                     copy_mo.write({'as_sale':sale.id})
-            mo_id.write({'product_qty':split_qty,'main_mo_id':copy_mo.id})
+            if copy_mo:
+                mo_id.write({'product_qty':split_qty,'main_mo_id':copy_mo.id})
+            else:
+                mo_id.write({'product_qty':split_qty})
             change_production_qty = self.env['change.production.qty'].create({'mo_id':mo_id.id,'product_qty':split_qty})
             change_production_qty.change_prod_qty()
             return True
@@ -61,7 +65,12 @@ class SplitManufactureOrder(models.TransientModel):
         if not machine:
             machine = 'ND'
         tipo_material = production_id.as_lot.name
+        if not production_id.as_machine_id.sequence_id:
+            raise Warning('La maquina seleccionada debe tener secuencia registrada.')
         new_name = production_id.as_machine_id.sequence_id.next_by_id()
         production_id.as_lot.write({
             'name': new_name
         })
+        #asignar lote a controles de calidad
+        for ckeck in production_id.check_ids:
+            ckeck.write({'lot_id':production_id.as_lot.id})
