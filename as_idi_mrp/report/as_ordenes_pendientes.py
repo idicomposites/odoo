@@ -141,8 +141,8 @@ class as_kardex_productos_excel(models.AbstractModel):
                 sheet.write(filas,5, line[2] or '',formatof)
                 sheet.write(filas,6, line[3] or '',formato)
                 sheet.write(filas,7, self.get_format_date(picking.scheduled_date) or '',formato)
-                sheet.write(filas,8, self.get_format_date(fecha1),formatol)
-                sheet.write(filas,9, self.get_format_date(fecha2) or '',formato)
+                sheet.write(filas,8, self.get_format_date_small(fecha1),formatol)
+                sheet.write(filas,9, self.get_format_date_small(fecha2) or '',formato)
                 sheet.write(filas,10, '',formatol)
                 sheet.write(filas,11, self.get_format_date(picking.date_done),formato)
                 sheet.write(filas,12, '',formatol)
@@ -155,6 +155,15 @@ class as_kardex_productos_excel(models.AbstractModel):
             dia = datetime.strptime(str(date), '%Y-%m-%d %H:%M:%S').strftime('%d')
             mes = self.get_mes(datetime.strptime(str(date), '%Y-%m-%d %H:%M:%S').strftime('%m'))
             year = datetime.strptime(str(date), '%Y-%m-%d %H:%M:%S').strftime('%y')
+            fecha= dia+'-'+mes+'-'+year
+        return fecha
+
+    def get_format_date_small(self,date):
+        fecha = ''
+        if date:
+            dia = datetime.strptime(str(date), '%Y-%m-%d').strftime('%d')
+            mes = self.get_mes(datetime.strptime(str(date), '%Y-%m-%d').strftime('%m'))
+            year = datetime.strptime(str(date), '%Y-%m-%d').strftime('%y')
             fecha= dia+'-'+mes+'-'+year
         return fecha
 
