@@ -115,6 +115,7 @@ class as_kardex_productos_excel(models.AbstractModel):
                 join product_product pp on pp.id = sol.product_id
                 join product_template pt on pt.id=pp.product_tmpl_id
                 where
+                so.state in ('sale','done') and 
                 so.date_order::date >='"""+str(data['form']['start_date'])+"""' AND  so.date_order::date <='"""+str(data['form']['end_date'])+"""' 
                 group by 1,2,3,4,5,6,7,8
                     """)
@@ -126,6 +127,12 @@ class as_kardex_productos_excel(models.AbstractModel):
             for line in all_movimientos_almacen:
                 mrp = self.env['mrp.production'].search([('as_sale', '=', line[0])],order='create_date desc',limit=1)
                 picking = self.env['stock.picking'].search([('origin', '=', line[2])],order='create_date desc',limit=1)
+                fecha1 = ''
+                fecha2 = ''
+                if 'x_studio_fecha_de_confirmacin' in mrp:
+                    fecha1 = mrp.x_studio_fecha_de_confirmacin                
+                if 'x_studio_fecha_de_confirmacin_cliente' in mrp:
+                    fecha2 = mrp.x_studio_fecha_de_confirmacin_cliente
                 sheet.write(filas,0, self.get_format_date(line[4]),formato)
                 sheet.write(filas,1, line[5],formato)
                 sheet.write(filas,2, '',formatol)
@@ -134,8 +141,8 @@ class as_kardex_productos_excel(models.AbstractModel):
                 sheet.write(filas,5, line[2] or '',formatof)
                 sheet.write(filas,6, line[3] or '',formato)
                 sheet.write(filas,7, self.get_format_date(picking.scheduled_date) or '',formato)
-                sheet.write(filas,8, self.get_format_date(mrp.x_studio_fecha_de_confirmacin),formatol)
-                sheet.write(filas,9, self.get_format_date(mrp.x_studio_fecha_de_confirmacin_cliente) or '',formato)
+                sheet.write(filas,8, self.get_format_date(fecha1),formatol)
+                sheet.write(filas,9, self.get_format_date(fecha2) or '',formato)
                 sheet.write(filas,10, '',formatol)
                 sheet.write(filas,11, self.get_format_date(picking.date_done),formato)
                 sheet.write(filas,12, '',formatol)
