@@ -48,7 +48,7 @@
         id="as_master_program"
         name="Reporte de Bajo Stock"
         action="action_master_production"
-        parent="mrp.menu_mrp_reporting"    
+        parent="purchase.purchase_report"    
         sequence="57" />
 
     
