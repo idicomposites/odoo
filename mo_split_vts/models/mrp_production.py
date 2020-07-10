@@ -20,3 +20,19 @@ class ManufacturingOrder(models.Model):
             'context': context,
         }
        
+    def action_confirm(self):
+        res = super(ManufacturingOrder, self).action_confirm()
+        for production in self:
+            if production.check_ids and production.as_lot:
+                for ckeck in production.check_ids:
+                    ckeck.write({'lot_id':production.as_lot.id})
+        return res    
+    
+    def action_assign(self):
+        res = super(ManufacturingOrder, self).action_assign()
+        for production in self:
+            if production.check_ids and production.as_lot:
+                for ckeck in production.check_ids:
+                    ckeck.write({'lot_id':production.as_lot.id})
+        return res
+
