@@ -27,7 +27,7 @@
         </field>
     </record>
 
-    <record id="action_master_production" model="ir.actions.act_window">
+    <record id="action_ordenes_pendientes" model="ir.actions.act_window">
         <field name="name">Reporte de Ordenes Pendientes</field>
         <field name="res_model">as.ordenes.pendientes</field>
         <field name="view_mode">tree,form</field>
@@ -47,7 +47,7 @@
     <menuitem
         id="as_ordenes_pendientes_id"
         name="Reporte de Ordenes Pendientes"
-        action="action_master_production"
+        action="action_ordenes_pendientes"
         parent="sale.menu_sale_report"    
         sequence="57" />
 
