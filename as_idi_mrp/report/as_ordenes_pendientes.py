@@ -79,7 +79,7 @@ class as_kardex_productos_excel(models.AbstractModel):
 
             # Titulos, subtitulos, filtros y campos del reporte
             sheet.merge_range('A5:G5', 'REPORTE DE ORDENES POR ENTREGAR', titulo1)
-            fecha = (datetime.now()).strftime('%d/%m/%Y %H:%M:%S')
+            fecha = (datetime.now()- timedelta(hours=5)).strftime('%d/%m/%Y %H:%M:%S')
             sheet.merge_range('E7:F7', 'Fecha impresion: ', letter5)
             sheet.merge_range('G7:H7', fecha)
 

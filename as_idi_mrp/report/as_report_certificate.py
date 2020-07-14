@@ -92,7 +92,7 @@ class as_kardex_productos_excel(models.AbstractModel):
             url = image_data_uri(self.env.user.company_id.logo)
             image_data = BytesIO(urlopen(url).read())
             sheet.insert_image('B1', url, {'image_data': image_data,'x_scale': 0.4, 'y_scale': 0.3})      
-            fecha = (datetime.now()).strftime('%d/%m/%Y %H:%M:%S')
+            fecha = (datetime.now()- timedelta(hours=5)).strftime('%d/%m/%Y %H:%M:%S')
             customer = ''
             if mo_id:
                 customer=mo_id.as_sale.partner_id.name
