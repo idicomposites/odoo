@@ -1,6 +1,6 @@
 {
     'name': 'Dividir ordenes de Produccion',
-    'version': '1.0.5',
+    'version': '1.0.6',
     'category': 'Manufacturing',
     'author': "Ahorasoft",
     'price': 27
