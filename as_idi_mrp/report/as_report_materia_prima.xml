@@ -14,7 +14,7 @@
                                 <h3>MATERIA PRIMA</h3><br/>
                                 CODIGO INTERNO: <span t-esc="move.product_id.default_code" /><br/>
                                 MATERIAL: <span t-esc="move.product_id.name" /><br/>
-                                LOTE: <span t-esc="move_line.lot_name or move_line.lot_id.name" /><br/>
+                                LOTE: <span t-esc="move_line.as_lot_supplier or move_line.as_lot_supplier" /><br/>
                                 FECHA: <t t-if="picking.date_done"><span t-esc="(datetime.datetime.strptime(str(picking.date_done), '%Y-%m-%d %H:%M:%S') - datetime.timedelta(hours=4)).strftime('%d/%m/%Y')" /><br/></t>
                                 OBS: <t t-if="move_line.lot_id.note"><span t-esc="picking.get_pobs(move_line.lot_id.note)" /></t><br/>
                                 INSPECTOR: <span t-esc="picking.get_partner_id()" /><br/>
@@ -29,7 +29,7 @@
 <div class="col-12 text-left">
                                                 <img t-att-src="image_data_uri(picking.get_qrcode(str(move.product_id.default_code)+'-'+move.picking_id.name+'-'+picking.get_format(contador)))"
                                                     style="max-height:3.5cm;max-width:3cm;" /><br/>
-                                <t t-esc="picking.get_actualiza_default_code(move_line.lot_id,str(move.product_id.default_code)+'-'+move.picking_id.name+'-'+picking.get_format(contador))"/>
+                                <!-- <t t-esc="picking.get_actualiza_default_code(move_line.lot_id,str(move.product_id.default_code)+'-'+move.picking_id.name+'-'+picking.get_format(contador))"/> -->
                                                     <span style='font-size:12px' t-esc="str(move.product_id.default_code)+'-'+move.picking_id.name+'-'+picking.get_format(contador)" /><br/>
                     </div>
                     <br/><br/>

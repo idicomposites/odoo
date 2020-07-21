@@ -20,9 +20,10 @@ class StockPicking(models.Model):
     _inherit = "stock.picking"
 
     as_contenedor_id = fields.One2many('as.contenedor', 'picking_id', string='Rules', help='The list of barcode rules')
+    as_generate_control= fields.Boolean(string='Bandera de controles',default=False) 
 
     def get_actualiza_default_code(self,lot_id,name):
-        lot_id.update({'ref':name})
+        lot_id.update({'ref':name,'lot_name':name})
 
     @api.model
     def create(self, vals):
@@ -92,3 +93,17 @@ class StockPicking(models.Model):
     # def get_name_picking(self,move_id):
     #     name=''
     #     move_line_id = self.env['stock.move.line'].search([('id', '=', move_id)])
+
+    def create_quality_from_picking(self):
+        for move in self.move_ids_without_package:
+            move._create_quality_checks_from_picking()
+        self.as_generate_control =True
+
+    def button_validate(self):
+        res = super(StockPicking, self).button_validate()
+        for check_id in self.check_ids:
+            for move in self.move_lines:
+                for move_lines in move.move_line_nosuggest_ids:
+                    if move_lines.lot_id.name == check_id.as_lot_name:
+                        check_id.lot_id = move_lines.lot_id
+        return res

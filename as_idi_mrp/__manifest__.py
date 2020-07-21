@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name' : "Ahorasoft MRP customizaciones",
-    'version' : "1.1.4",
+    'version' : "1.1.5",
     'author'  : "Ahorasoft",
     'description': """
 Customizaciones para IDI
@@ -25,6 +25,7 @@ Custom module for Latproject
         'views/as_res_partner.xml',
         'views/as_report_format.xml',
         'views/as_quality_views.xml',
+        'views/as_stock_move_line.xml',
         'report/as_empaque_report.xml',
         'wizard/as_programa_produccion.xml',
         'wizard/as_ordenes_pendientes.xml',
