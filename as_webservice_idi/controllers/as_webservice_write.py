@@ -329,14 +329,17 @@ class as_webservice(http.Controller):
     {
         "id": 123,
         "token": "c70bf37cbc0f4d758cc4651b4f999c6c",
-        "quantity_done": 111
+        "quantity_done": 111,
+        "lot_name": "2020-0002"
     }
     '''
     @http.route(["/tiamericas/mrp/consumido/"], auth='public', type="json", methods=['POST'],csrf=False)
     def mrpconsumido(self, bom_id = None, **pdata):
         post = yaml.load(request.httprequest.data)
         el_token = post.get('token') or 'sin_token'
+        lot_name = post.get('lot_name') or ''
         current_user = request.env['res.users'].sudo().search([('as_token', '=', el_token)])
+        lot_id = request.env['stock.production.lot'].sudo().search([('name', '=', lot_name)])
         if not current_user:
             res_json = json.dumps({'error': ('Token Invalido')})
             callback = post.get('callback')
@@ -349,7 +352,8 @@ class as_webservice(http.Controller):
                 
                 res = {}
                 wh_data = {
-                    'quantity_done':  quantity_done
+                    'quantity_done':  quantity_done,
+                    'as_lotes':  lot_name
                 }
 
                 if current_move:
