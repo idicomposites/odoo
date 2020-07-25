@@ -106,4 +106,8 @@ class StockPicking(models.Model):
                 for move_lines in move.move_line_nosuggest_ids:
                     if move_lines.lot_id.name == check_id.as_lot_name:
                         check_id.lot_id = move_lines.lot_id
+                        move_lines.lot_id.as_lot_supplier = move_lines.as_lot_supplier
+        for move in self.move_lines:
+            for move_lines in move.move_line_nosuggest_ids:
+                move_lines.lot_id.as_lot_supplier = move_lines.as_lot_supplier
         return res

@@ -30,7 +30,7 @@ class StockMove(models.Model):
         res = super(StockMove, self).write(values)
         cont = 1
         for line in self.move_line_nosuggest_ids:
-            line.lot_name = str(line.product_id.default_code)+'-'+line.picking_id.name+'-'+self.get_format(cont)
+            line.lot_name = str(line.product_id.default_code)+'-'+str(line.picking_id.name)+'-'+str(self.get_format(cont))
             cont+=1
         return res
 
@@ -44,7 +44,7 @@ class StockMove(models.Model):
     def get_name_lot(self):
         cont = 1
         for line in self.move_line_nosuggest_ids:
-            line.lot_name = str(line.product_id.default_code)+'-'+line.picking_id.name+'-'+self.get_format(cont)
+            line.lot_name = str(line.product_id.default_code)+'-'+str(line.picking_id.name)+'-'+str(self.get_format(cont))
             cont+=1
 
 

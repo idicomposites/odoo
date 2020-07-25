@@ -39,3 +39,8 @@ class SaleOrder(models.Model):
             'domain': [('id', 'in', tuple(ids))],
             'context': dict(self._context, create=False),
         }
+
+class ProductionLot(models.Model):
+    _inherit = 'stock.production.lot'
+
+    as_lot_supplier = fields.Char(string='Lote Proveedor')
