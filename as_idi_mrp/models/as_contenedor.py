@@ -14,7 +14,7 @@ class Contenedor(models.Model):
     _name = "as.contenedor"
 
     name = fields.Char(string='Nombre Contenedor')
-    as_entregado = fields.Boolean(string='Entregar Contenedor',default=True)
+    as_entregado = fields.Boolean(string='Entregar Contenedor',default=False)
     as_pesob_kg = fields.Float(string='Peso Bruto kg')
     as_peson_kg = fields.Float(string='Peso Neto kg')    
     as_pesob_lb = fields.Float(string='Peso Bruto lb')
