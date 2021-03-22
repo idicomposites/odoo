@@ -238,10 +238,10 @@ class StockPicking(models.Model):
                     #     'qty_done': qty,
                     #     'picking_id': picking.id,
                     # })
-                picking.action_confirm()
                 for line in picking.move_line_ids_without_package:
                     if len(contenedor.as_lote) > 0:
                         line.lot_id = contenedor.as_lote[0].id
+                picking.action_confirm()
 
 
 
@@ -252,6 +252,7 @@ class StockPicking(models.Model):
                     "name": contenedor.name ,
                     "as_pesob_kg": contenedor.as_pesob_kg,
                     "picking_id": picking.id,
+                    "as_entregado": True,
                     "as_peson_kg": contenedor.as_peson_kg,
                     "as_pesob_lb": contenedor.as_pesob_lb,
                     "as_peson_lb": contenedor.as_peson_lb,
