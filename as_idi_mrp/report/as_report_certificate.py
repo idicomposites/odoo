@@ -55,6 +55,7 @@ class as_kardex_productos_excel(models.AbstractModel):
         number_right_col = workbook.add_format({'font_size': 12, 'align': 'right', 'num_format': '#,##0.00','bg_color': 'silver'})
         number_center = workbook.add_format({'font_size': 12, 'align': 'center', 'num_format': '#,##0.00'})
         number_right_col.set_locked(False)
+        numero_personalizado = workbook.add_format({'font_size': 12, 'align': 'center', 'num_format': '#,##0','valign': 'vcenter','text_wrap': True,'bottom': True, 'top': True, 'left': True, 'right': True})
 
         letter12 = workbook.add_format({'font_size': 12, 'align': 'center', 'text_wrap': True, 'bold':True,'bottom': True, 'top': True, 'left': True, 'right': True})
         letter11 = workbook.add_format({'font_size': 12, 'align': 'center', 'valign': 'vcenter','text_wrap': True,'bottom': True, 'top': True, 'left': True, 'right': True})
@@ -79,11 +80,18 @@ class as_kardex_productos_excel(models.AbstractModel):
         sheet.set_column('I:I',10, letter1)
         sheet.set_column('J:J',20, letter1)
         sheet.set_column('K:K',10, letter1)
+        
 
         sheet.set_row(9,35)
         sheet.set_row(10,15)
 
         code_format = product_id.as_format_type_id.as_code
+
+        if code_format == 3:
+            sheet.set_row(17,30)
+        if code_format == 4:
+            sheet.set_row(19,30)
+
         if code_format in (1,2):
             columnas = product_id.as_format_type_id.as_cant_column
         else:
@@ -92,9 +100,11 @@ class as_kardex_productos_excel(models.AbstractModel):
             sheet.merge_range(2,5,3,15,'No se puedo generar el reporte los productos son distintos o producto no posee formato establecido',titulo1) 
         elif generate:
             if code_format <= 2:
-                sheet.merge_range(1,8,2,10,'BMC Certificate Of Analysis',titulo1) 
+                sheet.merge_range(1,8,2,11,'BMC Certificate Of Analysis',titulo1) 
+                # sheet.set_row(17,30)
             else:
                 sheet.merge_range(1,8,2,10,'SMC Certificate Of Analysis',titulo1) 
+                # sheet.set_row(19,30)
             # fecha_inicial = datetime.strptime(data['form']['start_date'], '%Y-%m-%d').strftime('%d/%m/%Y')
             # fecha_final = datetime.strptime(data['form']['end_date'], '%Y-%m-%d').strftime('%d/%m/%Y')
             # # Titulos, subtitulos, filtros y campos del reporte.
@@ -167,22 +177,23 @@ class as_kardex_productos_excel(models.AbstractModel):
                     mes = datetime.strptime(str(check.date_planned_start), '%Y-%m-%d %H:%M:%S').strftime('%m')
                     year = datetime.strptime(str(check.date_planned_start), '%Y-%m-%d %H:%M:%S').strftime('%Y')
                     fecha = str(dia)+'/'+str(self.get_mes(mes))+'/'+year
-                    sheet.write(filas, 1,check.as_lot.name,letter11) 
-                    sheet.merge_range(filas, 2,filas, 3,fecha,letter11) 
+                    sheet.write(filas, 1,check.as_lot.name,numero_personalizado) 
+                    sheet.merge_range(filas, 2,filas, 3,fecha,numero_personalizado) 
                     caja=''
                     if quality_check:
-                        if 'x_studio__box' in quality_check[0]:
-                            caja = quality_check[0].x_studio__box
-                            if caja == False:
-                                caja = 'N/A'
-                    sheet.merge_range(filas, 4,filas,5,caja,letter11) 
+
+                        box = self.env['as.contenedor'].search([('as_lote', 'in', [check.as_lot.id])])
+                        for linea in box:
+                            caja = linea.name
+
+                    sheet.merge_range(filas, 4,filas,5,caja,numero_personalizado) 
                     cont =6
                     for intem in point:
                         value = 0.0
                         for item in quality_check:
                             if intem.id == item.point_id.id:
                                 value = item.measure
-                        sheet.merge_range(filas, cont,filas, cont+1, float(value),letter11) #cliente/proveedor   
+                        sheet.merge_range(filas, cont,filas, cont+1, float(value),numero_personalizado) #cliente/proveedor   
                         cont+=2
                     filas += 1
             else:
@@ -215,24 +226,26 @@ class as_kardex_productos_excel(models.AbstractModel):
                         for item in quality_check:
                             if intem.id == item.point_id.id:
                                 value = item.measure
-                        sheet.write(filas, cont, float(intem.tolerance_min),letter11) #cliente/proveedor   
+                        sheet.write(filas, cont, float(intem.tolerance_min),numero_personalizado) #cliente/proveedor   
                         cont+=1                
-                        sheet.write(filas, cont, float(intem.tolerance_max),letter11) #cliente/proveedor   
+                        sheet.write(filas, cont, float(intem.tolerance_max),numero_personalizado) #cliente/proveedor   
                         cont+=1                
-                        sheet.write(filas, cont, float(value),letter11) #cliente/proveedor   
+                        sheet.write(filas, cont, float(value),numero_personalizado) #cliente/proveedor   
                         cont+=1
                     filas += 1
             filas += 2
-            sheet.merge_range(filas,1,filas+4,17,product_id.as_format_type_id.as_slogan,letter1) #cliente/proveedor 
+
+
+            sheet.merge_range(filas,1,filas+6,17,product_id.as_format_type_id.as_slogan,letter1) #cliente/proveedor 
             filas += 8
             ###Definir donde se rendea el pie slogan con los datos de la empresa
-            sheet.merge_range(filas,10,filas+3,8,product_id.as_format_type_id.as_sfooter,letter1d) 
+            sheet.merge_range(filas,11,filas+3,8,product_id.as_format_type_id.as_sfooter,letter1d) 
             ###FIN
             url = image_data_uri(product_id.as_format_type_id.image)
             image_data = BytesIO(urlopen(url).read())
-            sheet.insert_image('P'+str(filas), url, {'image_data': image_data,'x_offset': 0.7, 'y_offset': 0.5}) 
-            sheet.merge_range(filas+4,19,filas+4,15,product_id.as_format_type_id.as_code_iso,letter1) 
-
+            #Agregar la IMAGEN en posicion N y filas + 1
+            sheet.insert_image('Q'+str(filas+1), url, {'image_data': image_data,'x_offset': 0.7, 'y_offset': 0.5}) 
+            sheet.merge_range(filas+3,17,filas+3,15,product_id.as_format_type_id.as_code_iso,letter1) 
 
     def get_mes(self,mes):
         mesesDic = {
