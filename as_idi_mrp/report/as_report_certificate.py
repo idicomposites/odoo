@@ -99,8 +99,11 @@ class as_kardex_productos_excel(models.AbstractModel):
         if not generate or not product_id.as_format_type_id:
             sheet.merge_range(2,5,3,15,'No se puedo generar el reporte los productos son distintos o producto no posee formato establecido',titulo1) 
         elif generate:
-            if code_format <= 2:
+            if code_format == 2:
                 sheet.merge_range(1,8,2,11,'BMC Certificate Of Analysis',titulo1) 
+                # sheet.set_row(17,30)
+            elif code_format == 1:
+                sheet.merge_range(1,6,2,9,'BMC Certificate Of Analysis',titulo1) 
                 # sheet.set_row(17,30)
             else:
                 sheet.merge_range(1,8,2,10,'SMC Certificate Of Analysis',titulo1) 
@@ -235,17 +238,29 @@ class as_kardex_productos_excel(models.AbstractModel):
                     filas += 1
             filas += 2
 
+            if code_format == 1:
+                sheet.merge_range(filas,1,filas+6,14,product_id.as_format_type_id.as_slogan,letter1) #cliente/proveedor 
+                filas += 8
+                ###Definir donde se rendea el pie slogan con los datos de la empresa
+                sheet.merge_range(filas,9,filas+3,6,product_id.as_format_type_id.as_sfooter,letter1d) 
+                ###FIN
+                url = image_data_uri(product_id.as_format_type_id.image)
+                image_data = BytesIO(urlopen(url).read())
+                #Agregar la IMAGEN en posicion N y filas + 1
+                sheet.insert_image('N'+str(filas+1), url, {'image_data': image_data,'x_offset': 0.7, 'y_offset': 0.5}) 
+                sheet.merge_range(filas+3,14,filas+3,12,product_id.as_format_type_id.as_code_iso,letter1) 
 
-            sheet.merge_range(filas,1,filas+6,17,product_id.as_format_type_id.as_slogan,letter1) #cliente/proveedor 
-            filas += 8
-            ###Definir donde se rendea el pie slogan con los datos de la empresa
-            sheet.merge_range(filas,11,filas+3,8,product_id.as_format_type_id.as_sfooter,letter1d) 
-            ###FIN
-            url = image_data_uri(product_id.as_format_type_id.image)
-            image_data = BytesIO(urlopen(url).read())
-            #Agregar la IMAGEN en posicion N y filas + 1
-            sheet.insert_image('Q'+str(filas+1), url, {'image_data': image_data,'x_offset': 0.7, 'y_offset': 0.5}) 
-            sheet.merge_range(filas+3,17,filas+3,15,product_id.as_format_type_id.as_code_iso,letter1) 
+            else:
+                sheet.merge_range(filas,1,filas+6,17,product_id.as_format_type_id.as_slogan,letter1) #cliente/proveedor 
+                filas += 8
+                ###Definir donde se rendea el pie slogan con los datos de la empresa
+                sheet.merge_range(filas,11,filas+3,8,product_id.as_format_type_id.as_sfooter,letter1d) 
+                ###FIN
+                url = image_data_uri(product_id.as_format_type_id.image)
+                image_data = BytesIO(urlopen(url).read())
+                #Agregar la IMAGEN en posicion N y filas + 1
+                sheet.insert_image('Q'+str(filas+1), url, {'image_data': image_data,'x_offset': 0.7, 'y_offset': 0.5}) 
+                sheet.merge_range(filas+3,17,filas+3,15,product_id.as_format_type_id.as_code_iso,letter1) 
 
     def get_mes(self,mes):
         mesesDic = {
