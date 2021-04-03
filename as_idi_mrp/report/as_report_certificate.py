@@ -39,8 +39,11 @@ class as_kardex_productos_excel(models.AbstractModel):
         # if data['form']['as_empresa']:
         #     filtro+= ' and ae.id in '+ str(data['form']['as_empresa']).replace('[','(').replace(']',')')
         sheet = workbook.add_worksheet('Detalle de Movimientos')
-        sheet.set_paper(1)
+        sheet.set_paper(1)  
+        # sheet.center_horizontally()
+        
         sheet.set_landscape()
+        #worksheet.center_horizontally()
         
         titulo1 = workbook.add_format({'font_size': 16, 'align': 'center', 'valign': 'vcenter', 'text_wrap': True, 'bold':True })
         titulo2 = workbook.add_format({'font_size': 14, 'align': 'center', 'text_wrap': True, 'bottom': True, 'top': True, 'bold':True })
@@ -55,7 +58,7 @@ class as_kardex_productos_excel(models.AbstractModel):
         number_right_col = workbook.add_format({'font_size': 12, 'align': 'right', 'num_format': '#,##0.00','bg_color': 'silver'})
         number_center = workbook.add_format({'font_size': 12, 'align': 'center', 'num_format': '#,##0.00'})
         number_right_col.set_locked(False)
-        numero_personalizado = workbook.add_format({'font_size': 12, 'align': 'center', 'num_format': '#,##0','valign': 'vcenter','text_wrap': True,'bottom': True, 'top': True, 'left': True, 'right': True})
+        numero_personalizado = workbook.add_format({'font_size': 12, 'align': 'center','valign': 'vcenter','text_wrap': True,'bottom': True, 'top': True, 'left': True, 'right': True})
 
         letter12 = workbook.add_format({'font_size': 12, 'align': 'center', 'text_wrap': True, 'bold':True,'bottom': True, 'top': True, 'left': True, 'right': True})
         letter11 = workbook.add_format({'font_size': 12, 'align': 'center', 'valign': 'vcenter','text_wrap': True,'bottom': True, 'top': True, 'left': True, 'right': True})
@@ -89,11 +92,14 @@ class as_kardex_productos_excel(models.AbstractModel):
 
         if code_format == 3:
             sheet.set_row(17,30)
+            sheet.set_print_scale(60)
         if code_format == 4:
             sheet.set_row(19,30)
+            sheet.set_print_scale(60)
 
         if code_format in (1,2):
             columnas = product_id.as_format_type_id.as_cant_column
+            sheet.set_print_scale(70)
         else:
             columnas = product_id.as_format_type_id.as_cant_column
         if not generate or not product_id.as_format_type_id:
@@ -193,10 +199,18 @@ class as_kardex_productos_excel(models.AbstractModel):
                     cont =6
                     for intem in point:
                         value = 0.0
+                        decimales = 0
+                        formato = '{:.'
                         for item in quality_check:
                             if intem.id == item.point_id.id:
                                 value = item.measure
-                        sheet.merge_range(filas, cont,filas, cont+1, float(value),numero_personalizado) #cliente/proveedor   
+                                if item.as_decimales == False:
+                                    decimales = '0'
+                                else:
+                                    decimales = item.as_decimales
+                        formato +=  decimales 
+                        formato += 'f}'
+                        sheet.merge_range(filas, cont,filas, cont+1, formato.format(value),numero_personalizado) #cliente/proveedor   
                         cont+=2
                     filas += 1
             else:
@@ -226,14 +240,26 @@ class as_kardex_productos_excel(models.AbstractModel):
                     cont =3
                     for intem in point:
                         value = 0
+                        decimales = 0
+                        formato = '{:.'
                         for item in quality_check:
                             if intem.id == item.point_id.id:
                                 value = item.measure
-                        sheet.write(filas, cont, float(intem.tolerance_min),numero_personalizado) #cliente/proveedor   
+                                if item.as_decimales == False:
+                                    decimales = '0'
+                                else:
+                                    decimales = item.as_decimales
+                        formato +=  decimales 
+                        formato += 'f}'
+                        ###ELIMINAR LOS ESTILOS Y QUITARLE EL PARENT
+                        #sheet.write(filas, cont, float(intem.tolerance_min),numero_personalizado) #cliente/proveedor   
+                        sheet.write(filas, cont, formato.format(intem.tolerance_min),numero_personalizado) #cliente/proveedor   
                         cont+=1                
-                        sheet.write(filas, cont, float(intem.tolerance_max),numero_personalizado) #cliente/proveedor   
+                        #sheet.write(filas, cont, float(intem.tolerance_max),numero_personalizado) #cliente/proveedor   
+                        sheet.write(filas, cont, formato.format(intem.tolerance_max),numero_personalizado) #cliente/proveedor   
                         cont+=1                
-                        sheet.write(filas, cont, float(value),numero_personalizado) #cliente/proveedor   
+                        #sheet.write(filas, cont, float(value),numero_personalizado) #cliente/proveedor   
+                        sheet.write(filas, cont, formato.format(value),numero_personalizado) #cliente/proveedor   
                         cont+=1
                     filas += 1
             filas += 2

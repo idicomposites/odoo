@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name' : "Ahorasoft MRP customizaciones",
-    'version' : "1.3.5",
+    'version' : "1.3.6",
     'author'  : "Ahorasoft",
     'description': """
 Customizaciones para IDI
@@ -35,6 +35,7 @@ Custom module for Latproject
         'report/as_report_materia_prima.xml',
         'data/update_mo_cron.xml',
         'report/as_report_etiqueta_piso_lote.xml',
+        'views/as_decimales.xml',
              ],
     'demo' : [],
     'installable': True,
