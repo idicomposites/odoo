@@ -92,10 +92,10 @@ class as_kardex_productos_excel(models.AbstractModel):
 
         if code_format == 3:
             sheet.set_row(17,30)
-            sheet.set_print_scale(60)
+            sheet.set_print_scale(51)
         if code_format == 4:
             sheet.set_row(19,30)
-            sheet.set_print_scale(60)
+            sheet.set_print_scale(51)
 
         if code_format in (1,2):
             columnas = product_id.as_format_type_id.as_cant_column
@@ -112,7 +112,7 @@ class as_kardex_productos_excel(models.AbstractModel):
                 sheet.merge_range(1,6,2,9,'BMC Certificate Of Analysis',titulo1) 
                 # sheet.set_row(17,30)
             else:
-                sheet.merge_range(1,8,2,10,'SMC Certificate Of Analysis',titulo1) 
+                sheet.merge_range(1,9,2,11,'SMC Certificate Of Analysis',titulo1) 
                 # sheet.set_row(19,30)
             # fecha_inicial = datetime.strptime(data['form']['start_date'], '%Y-%m-%d').strftime('%d/%m/%Y')
             # fecha_final = datetime.strptime(data['form']['end_date'], '%Y-%m-%d').strftime('%d/%m/%Y')
@@ -152,21 +152,33 @@ class as_kardex_productos_excel(models.AbstractModel):
                 for point in point_all:
                     if quelity.point_id.id == point.id:
                         point_array.append(point.id)
+            # if columnas > 6:
+            #     sheet.set_print_scale(53)
+            # if columnas >= 8:
+            #     sheet.set_print_scale(50)
+            # if columnas >= 9:
+            #     sheet.set_print_scale(47)
+            # if columnas >= 10:
+            #     sheet.set_print_scale(44)
+            # if columnas >= 11:
+            #     sheet.set_print_scale(41)
+            # if columnas >= 12:
+            #     sheet.set_print_scale(38)
             point = self.env['quality.point'].search([('id', 'in', point_array)],order='as_secuencia asc',limit=columnas)
             quality_check = self.env['quality.check'].search([('product_id', '=', product_id.id)])
             if code_format >= 3:
-                sheet.merge_range('B10:E10', 'Propierty', letter12)
-                sheet.merge_range('F10:I10', 'Unit', letter12)
-                sheet.merge_range('J10:M10', 'Specification', letter12)
-                sheet.merge_range('N10:R10', 'Reference Method', letter12)
+                sheet.merge_range('B10:F10', 'Propierty', letter12)
+                sheet.merge_range('G10:J10', 'Unit', letter12)
+                sheet.merge_range('K10:P10', 'Specification', letter12)
+                sheet.merge_range('Q10:V10', 'Reference Method', letter12)
                 filas += 1
                 cont=10
                 for item in point_all:
                     cont +=1
-                    sheet.merge_range('B'+str(cont)+':E'+str(cont), str(item.title), letter11)
-                    sheet.merge_range('F'+str(cont)+':I'+str(cont), str(item.norm_unit), letter11)
-                    sheet.merge_range('J'+str(cont)+':M'+str(cont), str(item.tolerance_min)+'-'+str(item.tolerance_max), letter11)
-                    sheet.merge_range('N'+str(cont)+':R'+str(cont),item.x_studio_mtodo, letter11)
+                    sheet.merge_range('B'+str(cont)+':F'+str(cont), str(item.title), letter11)
+                    sheet.merge_range('G'+str(cont)+':J'+str(cont), str(item.norm_unit), letter11)
+                    sheet.merge_range('K'+str(cont)+':P'+str(cont), str(item.tolerance_min)+'-'+str(item.tolerance_max), letter11)
+                    sheet.merge_range('Q'+str(cont)+':V'+str(cont),item.x_studio_mtodo, letter11)
                     #sheet.write(cont-1,15, item.x_studio_mtodo, letter11)
                     filas += 1
             if int(code_format) >= 3:
@@ -249,9 +261,13 @@ class as_kardex_productos_excel(models.AbstractModel):
                                     decimales = '0'
                                 else:
                                     decimales = item.as_decimales
-                        formato +=  decimales 
+                        ## Decimales quality point
+                        if intem.as_decimales_num == False:
+                            decimales = '0'
+                        else:
+                            decimales = intem.as_decimales_num
+                        formato +=  decimales
                         formato += 'f}'
-                        ###ELIMINAR LOS ESTILOS Y QUITARLE EL PARENT
                         #sheet.write(filas, cont, float(intem.tolerance_min),numero_personalizado) #cliente/proveedor   
                         sheet.write(filas, cont, formato.format(intem.tolerance_min),numero_personalizado) #cliente/proveedor   
                         cont+=1                
@@ -275,6 +291,18 @@ class as_kardex_productos_excel(models.AbstractModel):
                 #Agregar la IMAGEN en posicion N y filas + 1
                 sheet.insert_image('N'+str(filas+1), url, {'image_data': image_data,'x_offset': 0.7, 'y_offset': 0.5}) 
                 sheet.merge_range(filas+3,14,filas+3,12,product_id.as_format_type_id.as_code_iso,letter1) 
+            
+            elif code_format >= 3:
+                sheet.merge_range(filas,1,filas+6,21,product_id.as_format_type_id.as_slogan,letter1) #cliente/proveedor 
+                filas += 8
+                ###Definir donde se rendea el pie slogan con los datos de la empresa
+                sheet.merge_range(filas,12,filas+3,9,product_id.as_format_type_id.as_sfooter,letter1d) 
+                ###FIN
+                url = image_data_uri(product_id.as_format_type_id.image)
+                image_data = BytesIO(urlopen(url).read())
+                #Agregar la IMAGEN en posicion N y filas + 1
+                sheet.insert_image('U'+str(filas+1), url, {'image_data': image_data,'x_offset': 0.7, 'y_offset': 0.5}) 
+                sheet.merge_range(filas+3,21,filas+3,19,product_id.as_format_type_id.as_code_iso,letter1) 
 
             else:
                 sheet.merge_range(filas,1,filas+6,17,product_id.as_format_type_id.as_slogan,letter1) #cliente/proveedor 
