@@ -210,8 +210,10 @@ class as_kardex_productos_excel(models.AbstractModel):
                     sheet.merge_range(filas, 4,filas,5,caja,numero_personalizado) 
                     cont =6
                     for intem in point:
+                        qa_check_aux = self.env['quality.check'].search([('point_id', '=',intem.id)])
                         value = 0.0
                         decimales = 0
+                        decimales_num = 0
                         formato = '{:.'
                         for item in quality_check:
                             if intem.id == item.point_id.id:
@@ -220,7 +222,11 @@ class as_kardex_productos_excel(models.AbstractModel):
                                     decimales = '0'
                                 else:
                                     decimales = item.as_decimales
-                        formato +=  decimales 
+                        if intem.as_decimales_num == False:
+                            decimales_num = '0'
+                        else:
+                            decimales_num = intem.as_decimales_num
+                        formato +=  decimales_num 
                         formato += 'f}'
                         sheet.merge_range(filas, cont,filas, cont+1, formato.format(value),numero_personalizado) #cliente/proveedor   
                         cont+=2
