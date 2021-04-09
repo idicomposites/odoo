@@ -97,9 +97,12 @@ class as_kardex_productos_excel(models.AbstractModel):
             sheet.set_row(19,30)
             sheet.set_print_scale(51)
 
-        if code_format in (1,2):
+        if code_format == 1:
             columnas = product_id.as_format_type_id.as_cant_column
             sheet.set_print_scale(70)
+        if code_format == 2:
+            columnas = product_id.as_format_type_id.as_cant_column
+            sheet.set_print_scale(60)
         else:
             columnas = product_id.as_format_type_id.as_cant_column
         if not generate or not product_id.as_format_type_id:
@@ -203,9 +206,13 @@ class as_kardex_productos_excel(models.AbstractModel):
                     caja=''
                     if quality_check:
 
-                        box = self.env['as.contenedor'].search([('as_lote', 'in', [check.as_lot.id])])
-                        for linea in box:
-                            caja = linea.name
+                        # box = self.env['as.contenedor'].search([('as_lote', 'in', [check.as_lot.id])])
+                        # # box_aux = self.env['quality.check'].search([('point_id', '=',intem.id)])
+                        # for linea in box:
+                        #     caja = linea.name
+                        for aux in quality_check:
+                            box_aux = self.env['quality.check'].search([('id', '=',aux.id)])
+                            caja = box_aux.as_box
 
                     sheet.merge_range(filas, 4,filas,5,caja,numero_personalizado) 
                     cont =6
@@ -214,7 +221,7 @@ class as_kardex_productos_excel(models.AbstractModel):
                         value = 0.0
                         decimales = 0
                         decimales_num = 0
-                        formato = '{:.'
+                        formato = '{:,.'
                         for item in quality_check:
                             if intem.id == item.point_id.id:
                                 value = item.measure
