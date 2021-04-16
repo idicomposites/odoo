@@ -21,7 +21,7 @@ class StockPicking(models.Model):
 
     as_contenedor_id = fields.One2many('as.contenedor', 'picking_id', string='Rules', help='The list of barcode rules')
     as_generate_control= fields.Boolean(string='Bandera de controles',default=False) 
-    as_stock_extra = fields.Many2one('stock.picking', string='Movimiento adicional')
+    as_stock_extra = fields.Many2one('stock.picking', string='Movimiento Remanente')
 
     def get_actualiza_default_code(self,lot_id,name):
         lot_id.update({'ref':name,'lot_name':name})
@@ -65,7 +65,10 @@ class StockPicking(models.Model):
         return self.env.user.partner_id.name
 
     def get_pobs(self,text):
-        return BeautifulSoup(text,"html.parser").text
+        textstr = ''
+        if text:
+            textstr = BeautifulSoup(text,"html.parser").text
+        return textstr
 
     def get_sale_name(self):
         venta =''
@@ -216,6 +219,7 @@ class StockPicking(models.Model):
                     'location_id': self.location_id.id,
                     'location_dest_id': self.location_dest_id.id,
                     'origin': self.origin,
+                    'sale_id': self.sale_id.id,
                 })
                 for line in self.move_ids_without_package:
                     move_id = self.env['stock.move'].create({
@@ -248,14 +252,16 @@ class StockPicking(models.Model):
                 # Process the delivery of the outgoing shipment
                 # self.env['stock.immediate.transfer'].create({'pick_ids': [(4, picking.id)]}).process()
                 self.as_stock_extra =picking
-                vals = {
-                    "name": contenedor.name ,
-                    "as_pesob_kg": contenedor.as_pesob_kg,
-                    "picking_id": picking.id,
-                    "as_entregado": True,
-                    "as_peson_kg": contenedor.as_peson_kg,
-                    "as_pesob_lb": contenedor.as_pesob_lb,
-                    "as_peson_lb": contenedor.as_peson_lb,
-                    "as_lote": contenedor.as_lote.ids,
-                }
-                contenido = self.env['as.contenedor'].create(vals)
+                for contenedor_r in self.as_contenedor_id:
+                    if not contenedor_r.as_entregado:
+                        vals = {
+                            "name": contenedor_r.name ,
+                            "as_pesob_kg": contenedor_r.as_pesob_kg,
+                            "picking_id": picking.id,
+                            "as_entregado": True,
+                            "as_peson_kg": contenedor_r.as_peson_kg,
+                            "as_pesob_lb": contenedor_r.as_pesob_lb,
+                            "as_peson_lb": contenedor_r.as_peson_lb,
+                            "as_lote": contenedor_r.as_lote.ids,
+                        }
+                        contenido = self.env['as.contenedor'].create(vals)
