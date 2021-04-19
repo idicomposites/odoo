@@ -219,7 +219,10 @@ class as_kardex_productos_excel(models.AbstractModel):
                     mes = datetime.strptime(str(check.date_planned_start), '%Y-%m-%d %H:%M:%S').strftime('%m')
                     year = datetime.strptime(str(check.date_planned_start), '%Y-%m-%d %H:%M:%S').strftime('%Y')
                     fecha = str(dia)+'/'+str(self.get_mes(mes))+'/'+year
-                    sheet.write(filas, 1,check.as_lot.name,numero_personalizado) 
+                    lote= ''
+                    if check.as_lot:
+                        lote = check.as_lot.name
+                    sheet.write(filas, 1,lote,numero_personalizado) 
                     sheet.merge_range(filas, 2,filas, 3,fecha,numero_personalizado) 
                     caja=''
                     if quality_check:
@@ -230,7 +233,8 @@ class as_kardex_productos_excel(models.AbstractModel):
                         #     caja = linea.name
                         for aux in quality_check:
                             box_aux = self.env['quality.check'].search([('id', '=',aux.id)])
-                            caja = box_aux.as_box
+                            if box_aux.as_box:
+                                caja = box_aux.as_box
 
                     sheet.merge_range(filas, 4,filas,5,caja,numero_personalizado) 
                     cont =6

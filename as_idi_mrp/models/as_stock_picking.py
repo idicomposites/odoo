@@ -41,6 +41,24 @@ class StockPicking(models.Model):
                     mrp.as_picking_id=ids
         return picking
 
+
+    def write(self, vals):
+        result = super(StockPicking, self).write(vals)
+        for rec in self:
+            lotes_comprometidos = []
+            for contenedor in rec.as_contenedor_id:
+                if contenedor.as_entregado == True:
+                    for lot in contenedor.as_lote:
+                        lotes_comprometidos.append(lot.id)
+            for contenedor in rec.as_contenedor_id:
+                if contenedor.as_entregado == False:
+                    for lot in contenedor.as_lote:
+                        if lot.id not in lotes_comprometidos:
+                            for move_line in rec.move_line_ids_without_package:
+                                if move_line.lot_id.id == lot.id:
+                                    move_line.unlink()
+        return result
+
     def get_qrcode(self,cadena_qr): 
         try:
             qr_img = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=10,border=0)
