@@ -42,22 +42,22 @@ class StockPicking(models.Model):
         return picking
 
 
-    def write(self, vals):
-        result = super(StockPicking, self).write(vals)
-        for rec in self:
-            lotes_comprometidos = []
-            for contenedor in rec.as_contenedor_id:
-                if contenedor.as_entregado == True:
-                    for lot in contenedor.as_lote:
-                        lotes_comprometidos.append(lot.id)
-            for contenedor in rec.as_contenedor_id:
-                if contenedor.as_entregado == False:
-                    for lot in contenedor.as_lote:
-                        if lot.id not in lotes_comprometidos:
-                            for move_line in rec.move_line_ids_without_package:
-                                if move_line.lot_id.id == lot.id:
-                                    move_line.unlink()
-        return result
+    # def write(self, vals):
+    #     result = super(StockPicking, self).write(vals)
+    #     for rec in self:
+    #         lotes_comprometidos = []
+    #         for contenedor in rec.as_contenedor_id:
+    #             if contenedor.as_entregado == True:
+    #                 for lot in contenedor.as_lote:
+    #                     lotes_comprometidos.append(lot.id)
+    #         for contenedor in rec.as_contenedor_id:
+    #             if contenedor.as_entregado == False:
+    #                 for lot in contenedor.as_lote:
+    #                     if lot.id not in lotes_comprometidos:
+    #                         for move_line in rec.move_line_ids_without_package:
+    #                             if move_line.lot_id.id == lot.id:
+    #                                 move_line.unlink()
+    #     return result
 
     def get_qrcode(self,cadena_qr): 
         try:
@@ -269,17 +269,28 @@ class StockPicking(models.Model):
 
                 # Process the delivery of the outgoing shipment
                 # self.env['stock.immediate.transfer'].create({'pick_ids': [(4, picking.id)]}).process()
-                self.as_stock_extra =picking
-                for contenedor_r in self.as_contenedor_id:
-                    if not contenedor_r.as_entregado:
-                        vals = {
-                            "name": contenedor_r.name ,
-                            "as_pesob_kg": contenedor_r.as_pesob_kg,
-                            "picking_id": picking.id,
-                            "as_entregado": True,
-                            "as_peson_kg": contenedor_r.as_peson_kg,
-                            "as_pesob_lb": contenedor_r.as_pesob_lb,
-                            "as_peson_lb": contenedor_r.as_peson_lb,
-                            "as_lote": contenedor_r.as_lote.ids,
-                        }
-                        contenido = self.env['as.contenedor'].create(vals)
+                vals = {
+                    "name": contenedor.name ,
+                    "as_pesob_kg": contenedor.as_pesob_kg,
+                    "picking_id": picking.id,
+                    "as_entregado": True,
+                    "as_peson_kg": contenedor.as_peson_kg,
+                    "as_pesob_lb": contenedor.as_pesob_lb,
+                    "as_peson_lb": contenedor.as_peson_lb,
+                    "as_lote": contenedor.as_lote.ids,
+                }
+                contenido = self.env['as.contenedor'].create(vals)
+
+                # for contenedor_r in self.as_contenedor_id:
+                #     if not contenedor_r.as_entregado:
+                #         vals = {
+                #             "name": contenedor_r.name ,
+                #             "as_pesob_kg": contenedor_r.as_pesob_kg,
+                #             "picking_id": picking.id,
+                #             "as_entregado": True,
+                #             "as_peson_kg": contenedor_r.as_peson_kg,
+                #             "as_pesob_lb": contenedor_r.as_pesob_lb,
+                #             "as_peson_lb": contenedor_r.as_peson_lb,
+                #             "as_lote": contenedor_r.as_lote.ids,
+                #         }
+                #         contenido = self.env['as.contenedor'].create(vals)
