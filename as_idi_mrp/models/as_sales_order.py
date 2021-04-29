@@ -23,24 +23,26 @@ class SaleOrder(models.Model):
 
     def _get_lotes_lines(self):
         resultado = 0
-        mo = self.env['mrp.production'].search([('origin', '=', self.name)])
-        if mo:
-            mos = self.env['mrp.production'].search([('origin', '=', mo.name)])
-            self.as_cantidad_mo = len(mo)+len(mos)
+        mos_o = self.env['mrp.production'].search([('origin', '=', self.name)])
+        if mos_o:
+            for mo in mos_o:
+                mos = self.env['mrp.production'].search([('origin', '=', mo.name)])
+                self.as_cantidad_mo = len(mo)+len(mos)
         else:
             self.as_cantidad_mo = 0
 
     def open_entries(self):
         ids =[]
         mos = self.env['mrp.production']
-        mo = self.env['mrp.production'].search([('origin', '=', self.name)])
-        if mo:
-            mos = self.env['mrp.production'].search([('origin', '=', mo.name)])
-            for order in mo:
-                ids.append(order.id)
-            if mos:
-                for order2 in mos:
-                    ids.append(order2.id)
+        mos_o = self.env['mrp.production'].search([('origin', '=', self.name)])
+        if mos_o:
+            for mo in mos_o:
+                mos = self.env['mrp.production'].search([('origin', '=', mo.name)])
+                for order in mo:
+                    ids.append(order.id)
+                if mos:
+                    for order2 in mos:
+                        ids.append(order2.id)
         return {
             'name': _('Producciones'),
             'view_mode': 'tree',
