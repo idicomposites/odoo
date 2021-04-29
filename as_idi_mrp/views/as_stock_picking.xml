@@ -32,6 +32,7 @@
             </xpath>
             <xpath expr="//button[@name='action_toggle_is_locked']" position="after">
                 <button name="as_get_lote_done" type="object" class="btn-primary" string="Comprobar Lotes"/>
+                <button name="as_comprobar_remanente" type="object" class="btn-primary" string="Remanente"/>
                 <!-- <button name="as_generate_remanente" type="object" class="btn-primary" string="Prueba Remanente"/> -->
             </xpath>
             <xpath expr="//button[@name='check_quality']" position="attributes">
