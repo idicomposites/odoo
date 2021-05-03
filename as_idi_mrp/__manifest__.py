@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name' : "Ahorasoft MRP customizaciones",
-    'version' : "1.4.4",
+    'version' : "1.4.5",
     'author'  : "Ahorasoft",
     'description': """
 Customizaciones para IDI

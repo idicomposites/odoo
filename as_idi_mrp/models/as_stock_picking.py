@@ -298,6 +298,8 @@ class StockPicking(models.Model):
                             "as_lote": contenedor_r.as_lote.ids,
                         }
                         contenido = self.env['as.contenedor'].create(vals)
+            else:
+                raise UserError(_('El movimiento actual ya posee Remanente, dirijase al movimiento remanente actual, si desea seguir generando remanente de contenedores'))
 
     def as_comprobar_remanente(self):
         if not self.move_line_ids_without_package:
@@ -334,18 +336,20 @@ class StockPicking(models.Model):
                             if len(contenedor.as_lote) > 0:
                                 line.lot_id = contenedor.as_lote[0].id
                 picking.action_confirm()
-            self.as_stock_extra =picking
-            for contenedor_r in self.as_contenedor_id:
-                if contenedor_r.as_entregado:
-                    vals = {
-                        "name": contenedor_r.name ,
-                        "as_pesob_kg": contenedor_r.as_pesob_kg,
-                        "picking_id": picking.id,
-                        "as_entregado": True,
-                        "as_peson_kg": contenedor_r.as_peson_kg,
-                        "as_pesob_lb": contenedor_r.as_pesob_lb,
-                        "as_peson_lb": contenedor_r.as_peson_lb,
-                        "as_lote": contenedor_r.as_lote.ids,
-                    }
-                    contenido = self.env['as.contenedor'].create(vals)
-                    contenedor_r.unlink()
+                self.as_stock_extra =picking
+                for contenedor_r in self.as_contenedor_id:
+                    if contenedor_r.as_entregado:
+                        vals = {
+                            "name": contenedor_r.name ,
+                            "as_pesob_kg": contenedor_r.as_pesob_kg,
+                            "picking_id": picking.id,
+                            "as_entregado": True,
+                            "as_peson_kg": contenedor_r.as_peson_kg,
+                            "as_pesob_lb": contenedor_r.as_pesob_lb,
+                            "as_peson_lb": contenedor_r.as_peson_lb,
+                            "as_lote": contenedor_r.as_lote.ids,
+                        }
+                        contenido = self.env['as.contenedor'].create(vals)
+                        contenedor_r.unlink()
+            else:
+                raise UserError(_('El movimiento actual ya posee Remanente, dirijase al movimiento remanente actual, si desea seguir generando remanente de contenedores'))
