@@ -238,13 +238,15 @@ class StockPicking(models.Model):
     def as_generate_remanente(self):
             qty = float(self.env['ir.config_parameter'].sudo().get_param('res_config_settings.as_factor')) or 0.001
             if not self.as_stock_extra:
+                venta = self.env['sale.order'].search([('name', '=', self.origin)])
                 picking = self.env['stock.picking'].create({
                     'partner_id': self.partner_id.id,
                     'picking_type_id': self.picking_type_id.id,
                     'location_id': self.location_id.id,
                     'location_dest_id': self.location_dest_id.id,
                     'origin': self.origin,
-                    'sale_id': self.sale_id.id,
+                    'sale_id': venta.id,
+                    'group_id': venta.procurement_group_id.id,
                 })
                 cant = 0.0
                 for contenedor in self.as_contenedor_id:
@@ -264,6 +266,7 @@ class StockPicking(models.Model):
                                 'product_uom_qty': qty,
                                 'quantity_done': qty,
                                 'picking_id': picking.id,
+                                'group_id': venta.procurement_group_id.id,
                             })
                             # self.env['stock.move.line'].create({
                             #     'location_id': line.location_id.id,
@@ -285,6 +288,7 @@ class StockPicking(models.Model):
                 # Process the delivery of the outgoing shipment
                 # self.env['stock.immediate.transfer'].create({'pick_ids': [(4, picking.id)]}).process()
                 self.as_stock_extra =picking
+                # self.env.cr.execute("""update stock_picking set group_id="""+str(venta.procurement_group_id.id)+""" where id = """+str(picking.id))
                 for contenedor_r in self.as_contenedor_id:
                     if not contenedor_r.as_entregado:
                         vals = {
@@ -305,13 +309,15 @@ class StockPicking(models.Model):
         if not self.move_line_ids_without_package:
             qty = float(self.env['ir.config_parameter'].sudo().get_param('res_config_settings.as_factor')) or 0.001
             if not self.as_stock_extra:
+                venta = self.env['sale.order'].search([('name', '=', self.origin)])
                 picking = self.env['stock.picking'].create({
                     'partner_id': self.partner_id.id,
                     'picking_type_id': self.picking_type_id.id,
                     'location_id': self.location_id.id,
                     'location_dest_id': self.location_dest_id.id,
                     'origin': self.origin,
-                    'sale_id': self.sale_id.id,
+                    'sale_id': venta.id,
+                    'group_id': venta.procurement_group_id.id,
                 })
                 cant = 0.0
                 for contenedor in self.as_contenedor_id:
@@ -331,12 +337,14 @@ class StockPicking(models.Model):
                                 'product_uom_qty': qty,
                                 'quantity_done': qty,
                                 'picking_id': picking.id,
+                                'group_id': venta.procurement_group_id.id,
                             })
                         for line in picking.move_line_ids_without_package:
                             if len(contenedor.as_lote) > 0:
                                 line.lot_id = contenedor.as_lote[0].id
                 picking.action_confirm()
                 self.as_stock_extra =picking
+                # self.env.cr.execute("""update stock_picking set group_id="""+str(venta.procurement_group_id.id)+""" where id = """+str(picking.id))
                 for contenedor_r in self.as_contenedor_id:
                     if contenedor_r.as_entregado:
                         vals = {
