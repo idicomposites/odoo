@@ -9,7 +9,7 @@ class CierreAnual(models.TransientModel):
     _name = 'cierre.anual'
     
     cuenta_de_resultados = fields.Many2one('account.account', string='Cuenta de resultados')
-    ano = fields.Selection([('2023','2023'),('2022','2022'),('2021','2021'),('2020','2020'),('2019','2019'),('2018','2018')], string='Ano')
+    ano = fields.Selection([('2024','2024'),('2023','2023'),('2022','2022'),('2021','2021')], string='Ano')
     journal_id = fields.Many2one('account.journal',string='Diario')
 
     def validar_cierre_anual(self):

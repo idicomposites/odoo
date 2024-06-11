@@ -224,7 +224,8 @@ class TrialBalanceReport(models.AbstractModel):
             total_amount[acc_id]["balance"] = tb["balance"]
             total_amount[acc_id]["initial_balance"] = 0.0
             if self.env["account.account"].browse(acc_id).cuenta_tipo == 'A' or self.env["account.account"].browse(acc_id).group_id.cuenta_tipo == 'A':
-                total_amount[acc_id]["ending_balance"] = total_amount[acc_id]["initial_balance"] * -1  + total_amount[acc_id]["credit"] - total_amount[acc_id]["debit"]
+                total_amount[acc_id]["ending_balance"] = tb["balance"] * -1
+#                total_amount[acc_id]["ending_balance"] = total_amount[acc_id]["initial_balance"] * -1 + total_amount[acc_id]["credit"] - total_amount[acc_id]["debit"]
             else:
                 total_amount[acc_id]["ending_balance"] = tb["balance"]
                 
@@ -252,7 +253,8 @@ class TrialBalanceReport(models.AbstractModel):
             else:
                 if self.env["account.account"].browse(acc_id).cuenta_tipo == 'A' or self.env["account.account"].browse(acc_id).group_id.cuenta_tipo == 'A':
                     total_amount[acc_id]["initial_balance"] = tb["balance"] * -1
-                    total_amount[acc_id]["ending_balance"] += tb["balance"] * -1 + total_amount[acc_id]["credit"] - total_amount[acc_id]["debit"]
+                    total_amount[acc_id]["ending_balance"] += tb["balance"] * -1
+#                    total_amount[acc_id]["ending_balance"] += tb["balance"] * -1 + total_amount[acc_id]["credit"] - total_amount[acc_id]["debit"]
                 else:
                     total_amount[acc_id]["initial_balance"] = tb["balance"]
                     total_amount[acc_id]["ending_balance"] += tb["balance"]

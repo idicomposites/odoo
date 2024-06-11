@@ -10,7 +10,7 @@ class ReporteDIOTWizard(models.TransientModel):
     _name = 'reporte.diot.wizard'
     _description = 'reporte_diot_wizard'
 
-    year = fields.Selection([('2023','2023'),('2022','2022'),('2021','2021'),('2020','2020'),('2019','2019'), ('2018','2018'), ('2017','2017')], string="Año", required=1)
+    year = fields.Selection([('2024','2024'),('2023','2023'),('2022','2022'),('2021','2021')], string="Año", required=1)
     month = fields.Selection([('01','Enero'),('02','Febrero'),('03','Marzo'),('04','Abril'),('05','Mayo'),('06','Junio'),('07','Julio'),('08','Agosto'),('09','Septiembre'),('10','Octubre'),('11', 'Noviembre'),('12','Diciembre')], string='Mes', required=1)
 
     def action_view_report(self):

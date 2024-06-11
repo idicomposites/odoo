@@ -16,7 +16,7 @@ class PolizasReport(models.TransientModel):
     fecha_mes = fields.Selection([('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05', 'Mayo'), ('06', 'Junio'),
                                     ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10', 'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')],
                                    string='Mes', required= True)
-    fecha_ano = fields.Selection([('2020', '2020'),('2021', '2021'),('2022', '2022'),('2023', '2023')],
+    fecha_ano = fields.Selection([('2024', '2024'),('2023', '2023'),('2022', '2022'),('2021', '2021')],
                                    required= True, string='Año')
     tiposolicitud = fields.Selection(
         selection=[('AF', 'Acto de Fiscalización'), 
@@ -125,13 +125,14 @@ class PolizasReport(models.TransientModel):
             json_response = response.json()
 
         estado_factura = json_response.get('estado_conta','')
-        if estado_factura == 'problemas_contabilidad':
+        if not estado_factura:
+           estado_factura = json_response.get('estado_factura','')
+        if estado_factura == 'problemas_contabilidad' or estado_factura == 'problemas_factura':
             raise UserError(_(json_response['problemas_message']))
         if json_response.get('conta_xml'):
 
             #_logger.info("xml %s", json_response['conta_xml'])
             #_logger.info("zip %s", json_response['conta_zip'])
-
             #return base64.b64decode(json_response['conta_xml'])
             try:
                 form_id = self.env['ir.model.data'].get_object_reference('contabilidad_cfdi', 'reporte_conta_xml_zip_download_wizard_download_form_view_itadmin')[1]
@@ -140,7 +141,6 @@ class PolizasReport(models.TransientModel):
             ctx.update({'default_xml_data': json_response['conta_xml'], 'default_zip_data': json_response.get('conta_zip', None)})
             return {
                 'type': 'ir.actions.act_window',
-                'view_type': 'form',
                 'view_mode': 'form',
                 'res_model': 'conta.xml.zip.download',
                 'views': [(form_id, 'form')],

@@ -15,7 +15,7 @@ class GenerarXmlHirarchyWizard(models.TransientModel):
     fecha_mes = fields.Selection([('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05', 'Mayo'), ('06', 'Junio'),
                                     ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10', 'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')],
                                    string='Mes', store=True)
-    fecha_ano = fields.Selection([('2023', '2023'),('2022','2022'),('2018', '2018'), ('2019', '2019'),('2020', '2020'),('2021', '2021')],
+    fecha_ano = fields.Selection([('2024', '2024'),('2023', '2023'),('2022','2022'),('2021', '2021')],
                                    string='Año', store=True)
     procesa_nivel = fields.Char(string='Nivel a procesar', store=True, default='2')
     tipo_de_reporte = fields.Selection([('Catalogo de cuentas','Catalogo de cuentas'),('Balance mensual', 'Balance mensual')],string='Tipo de reporte')
@@ -418,8 +418,9 @@ class GenerarXmlHirarchyWizard(models.TransientModel):
 
         json_response = response.json()
         estado_factura = json_response.get('estado_conta','')
-        if estado_factura == 'problemas_contabilidad':
-#            _logger.info('si entra a problemas facturas')
+        if not estado_factura:
+           estado_factura = json_response.get('estado_factura','')
+        if estado_factura == 'problemas_contabilidad' or estado_factura == 'problemas_factura':
             raise UserError(_(json_response['problemas_message']))
         if json_response.get('conta_xml'):
             
@@ -431,7 +432,7 @@ class GenerarXmlHirarchyWizard(models.TransientModel):
                 form_id = self.env['ir.model.data'].get_object_reference('contabilidad_cfdi', 'reporte_conta_xml_zip_download_wizard_download_form_view_itadmin')[1]
             except ValueError:
                 form_id = False
-            ctx.update({'default_xml_data': json_response['conta_xml'], 'default_zip_data': json_response.get('conta_zip', None),'conta_name':json_response['conta_name']})    
+            ctx.update({'default_xml_data': json_response['conta_xml'], 'default_zip_data': json_response.get('conta_zip', None),'conta_name':json_response['conta_name']})
             return {
                 'name': 'genera xml',   
                 'type': 'ir.actions.act_window',
@@ -450,6 +451,8 @@ class GenerarXmlHirarchyWizard(models.TransientModel):
     @api.model
     def to_json(self, total_amount):
         company = self.env.user.company_id
+        if not company.archivo_cer or not company.archivo_key:
+           raise UserError("No tiene cargado el certificado correctamente.")
         archivo_cer = company.archivo_cer
         archivo_key = company.archivo_key
         request_params = { 
@@ -504,7 +507,7 @@ class GenerarXmlHirarchyWizard(models.TransientModel):
                        },})
             request_params['informacion'].update({'proceso': 'balanza',})
 
-        _logger.info(json.dumps(request_params))
+        #_logger.info(json.dumps(request_params))
         return request_params
 
 class ContaXMLZIPDownload(models.TransientModel):

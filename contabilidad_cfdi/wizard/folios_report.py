@@ -16,7 +16,7 @@ class FoliosReport(models.TransientModel):
     fecha_mes = fields.Selection([('01', 'Enero'), ('02', 'Febrero'), ('03', 'Marzo'), ('04', 'Abril'), ('05', 'Mayo'), ('06', 'Junio'),
                                     ('07', 'Julio'), ('08', 'Agosto'), ('09', 'Septiembre'), ('10', 'Octubre'), ('11', 'Noviembre'), ('12', 'Diciembre')],
                                    string='Mes', required= True)
-    fecha_ano = fields.Selection([('2020', '2020'),('2021', '2021'),('2022', '2022'),('2023', '2023')],
+    fecha_ano = fields.Selection([('2024', '2024'),('2023', '2023'),('2022', '2022'),('2021', '2021')],
                                    required= True, string='Año')
     tiposolicitud = fields.Selection(
         selection=[('AF', 'Acto de Fiscalización'), 
@@ -41,6 +41,8 @@ class FoliosReport(models.TransientModel):
 
         journal_entries = self.env['account.move'].search(domain)
         company = self.env.user.company_id
+        if not company.archivo_cer or not company.archivo_key:
+           raise UserError("No tiene cargado el certificado correctamente.")
         archivo_cer = company.archivo_cer
         archivo_key = company.archivo_key
         request_params = {
@@ -107,7 +109,9 @@ class FoliosReport(models.TransientModel):
 
         json_response = response.json()
         estado_factura = json_response.get('estado_conta','')
-        if estado_factura == 'problemas_contabilidad':
+        if not estado_factura:
+           estado_factura = json_response.get('estado_factura','')
+        if estado_factura == 'problemas_contabilidad' or estado_factura == 'problemas_factura':
             raise UserError(_(json_response['problemas_message']))
         if json_response.get('conta_xml'):
 

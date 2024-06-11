@@ -6,6 +6,7 @@ from odoo import api, models, fields
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
+    _description = 'AccountMoveLine' 
 
     contabilidad_electronica = fields.Boolean('CE', compute='_compute_ce')
     account_cfdi_ids = fields.One2many('account.move.cfdi33','move_line_id', 'CFDI 4.0')
